@@ -779,6 +779,20 @@
     }
   },
 
+{
+  "male": {
+    "... all existing age‑bucket tables ...": {}
+  },
+
+  "female": {
+    "... all existing age‑bucket tables ...": {}
+  },
+
+  /* -------------------------------------------------------------
+     Minimum points a candidate must obtain in each component in order
+     to be eligible for a PASS.  These values come straight from the
+     “Minimum Component Values” rows in the PDF.
+     ------------------------------------------------------------- */
   "minimumComponentValues": {
     "run": 5,
     "pushups": 4,
@@ -787,9 +801,13 @@
     "whtr": 4
   },
 
+  /* -------------------------------------------------------------
+     Composite‑score categories – kept here for easy reference.
+     ------------------------------------------------------------- */
   "compositeCategories": {
     "excellent": 90,
     "satisfactoryMin": 75,
     "unsatisfactoryMax": 74.9
   }
 }
+
