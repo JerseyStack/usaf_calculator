@@ -7,13 +7,11 @@
 <style>
   body{font-family:sans-serif;padding:1rem;}
   label{display:block;margin-top:1rem;}
-  input,select{width:100%;padding:.5rem;}
-  button{margin-top:1rem;padding:.6rem;}
+  input,select,button{width:100%;padding:.5rem;}
   .result{margin-top:2rem;padding:1rem;border:2px solid #444;}
 </style>
 </head>
 <body>
-
 <h1>USAF PT Demo</h1>
 <form id="ptForm">
   <label>Gender
@@ -31,69 +29,86 @@
 <div id="out" class="result" style="display:none;"></div>
 
 <script>
-function mmssToSec(s){const [m,sec]=s.split(':').map(Number);return m*60+sec;}
+/* ---------- fetch the JSON ---------- */
+let PT_DATA = null;
+fetch('usaf_pt_charts_clean.json')
+  .then(r => {
+    console.log('Fetch status', r.status);
+    return r.json();
+  })
+  .then(data => {
+    PT_DATA = data;
+    console.log('JSON loaded – keys', Object.keys(PT_DATA));
+  })
+  .catch(err => console.error('Load error', err));
+
+/* ---------- helpers ---------- */
+function mmssToSec(s){ const [m,sec]=s.split(':').map(Number); return m*60+sec; }
 function getAgeBucket(a){
-  if(a<25) return "<25"; if(a<=29) return "25-29";
-  if(a<=34) return "30-34"; if(a<=39) return "35-39";
-  if(a<=44) return "40-44"; if(a<=49) return "45-49";
-  if(a<=54) return "50-54"; if(a<=59) return "55-59";
+  if(a<25) return "<25";
+  if(a<=29) return "25-29";
+  if(a<=34) return "30-34";
+  if(a<=39) return "35-39";
+  if(a<=44) return "40-44";
+  if(a<=49) return "45-49";
+  if(a<=54) return "50-54";
+  if(a<=59) return "55-59";
   return "60+";
 }
+function lookupRun(tbl, secs){
+  const rows = Object.entries(tbl).map(([k,v])=>[mmssToSec(k),v]).sort((a,b)=>a[0]-b[0]);
+  let pts = 0;
+  for(let i=rows.length-1;i>=0;i--) if(secs<=rows[i][0]) { pts = rows[i][1]; break; }
+  return pts;
+}
 function lookupNumeric(tbl,val){
-  const keys=Object.keys(tbl).map(Number).sort((a,b)=>a-b);
+  const keys = Object.keys(tbl).map(Number).sort((a,b)=>a-b);
   for(let i=keys.length-1;i>=0;i--) if(val>=keys[i]) return tbl[keys[i]];
   return 0;
 }
-function lookupRun(tbl,sec){
-  const rows=Object.entries(tbl).map(([k,v])=>[mmssToSec(k),v]).sort((a,b)=>a[0]-b[0]);
-  for(let i=rows.length-1;i>=0;i--) if(sec<=rows[i][0]) return rows[i][1];
-  return 0;
-}
-const WHR_TABLE={"0.49":20,"0.50":19,"0.51":18,"0.52":17,"0.53":16,"0.54":15,
-                "0.55":12.5,"0.56":10,"0.57":7.5,"0.58":5,"0.59":2.5,"0.60":0};
+const WHR_TABLE = {"0.49":20,"0.50":19,"0.51":18,"0.52":17,"0.53":16,"0.54":15,
+                  "0.55":12.5,"0.56":10,"0.57":7.5,"0.58":5,"0.59":2.5,"0.60":0};
 function lookupWHR(w,h){
-  const r=(w/h).toFixed(2);
-  const keys=Object.keys(WHR_TABLE).map(Number).sort((a,b)=>a-b);
+  const r = (w/h).toFixed(2);
+  const keys = Object.keys(WHR_TABLE).map(Number).sort((a,b)=>a-b);
   for(let i=keys.length-1;i>=0;i--) if(r<=keys[i]) return {pts:WHR_TABLE[keys[i].toFixed(2)],ratio:r};
   return {pts:0,ratio:r};
 }
-let PT_DATA=null;
-fetch('usaf_pt_charts_clean.json')
-  .then(r=>r.json())
-  .then(d=>{PT_DATA=d; console.log('JSON loaded');})
-  .catch(e=>console.error('JSON load error',e));
 
+/* ---------- form submit ---------- */
 document.getElementById('ptForm').addEventListener('submit',e=>{
   e.preventDefault();
-  if(!PT_DATA){alert('Data not loaded yet');return;}
-  const gender=document.getElementById('gender').value;
-  const age=+document.getElementById('age').value;
-  const run=document.getElementById('runTime').value.trim();
-  const sit=+document.getElementById('situps').value;
-  const push=+document.getElementById('pushups').value;
-  const waist=+document.getElementById('waist').value;
-  const height=+document.getElementById('height').value;
+  if(!PT_DATA){ alert('Data not loaded yet'); return; }
 
-  const bucket=getAgeBucket(age);
-  const bucketData=PT_DATA[gender][bucket];
-  if(!bucketData){alert('No bucket data');return;}
+  const gender = document.getElementById('gender').value;
+  const age    = Number(document.getElementById('age').value);
+  const runStr = document.getElementById('runTime').value.trim();
+  const sit    = Number(document.getElementById('situps').value);
+  const push   = Number(document.getElementById('pushups').value);
+  const waist  = Number(document.getElementById('waist').value);
+  const height = Number(document.getElementById('height').value);
 
-  const runPts=lookupRun(bucketData.run,mmssToSec(run));
-  const sitPts=lookupNumeric(bucketData.situps,sit);
-  const pushPts=lookupNumeric(bucketData.pushups,push);
-  const whr=lookupWHR(waist,height);
+  const bucket = getAgeBucket(age);
+  const bucketData = PT_DATA[gender][bucket];
+  if(!bucketData){ alert('No data for that age/gender'); return; }
 
-  const total=runPts+sitPts+pushPts+whr.pts;
-  const passed=total>=75 && runPts>=5 && sitPts>=4 && pushPts>=4 && whr.pts>=4;
+  const runPts   = lookupRun(bucketData.run, mmssToSec(runStr));
+  const sitPts   = lookupNumeric(bucketData.situps, sit);
+  const pushPts  = lookupNumeric(bucketData.pushups, push);
+  const whrInfo  = lookupWHR(waist, height);
 
-  const out=document.getElementById('out');
+  const total = runPts + sitPts + pushPts + whrInfo.pts;
+  const passed = (total>=75) && (runPts>=5) && (sitPts>=4) && (pushPts>=4) && (whrInfo.pts>=4);
+
+  const out = document.getElementById('out');
   out.style.display='block';
-  out.innerHTML=`<p>Run: ${runPts} pts</p>
-                <p>Sit‑ups: ${sitPts} pts</p>
-                <p>Push‑ups: ${pushPts} pts</p>
-                <p>WHtR (${whr.ratio}): ${whr.pts} pts</p>
-                <p><strong>Total = ${total}</strong></p>
-                <p>${passed?'PASS':'FAIL'}</p>`;
+  out.innerHTML = `
+    <p>Run: ${runPts} pts</p>
+    <p>Sit‑ups: ${sitPts} pts</p>
+    <p>Push‑ups: ${pushPts} pts</p>
+    <p>WHtR (${whrInfo.ratio}): ${whrInfo.pts} pts</p>
+    <p><strong>Total = ${total}</strong></p>
+    <p>${passed?'PASS':'FAIL'}</p>`;
 });
 </script>
 </body>
