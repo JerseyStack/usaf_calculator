@@ -135,34 +135,28 @@ const getAgeBucket = age => {
 // ========================================================================
 // SCORE LOOKUP LOGIC
 // ========================================================================
-// For reps/shuttles: Find the highest valid tier the user achieved.
 const lookupNumeric = (table, value) => {
   if (!table) return 0;
-  const tiers = Object.keys(table).map(Number).sort((a, b) => b - a); // Sort descending
+  const tiers = Object.keys(table).map(Number).sort((a, b) => b - a);
   for (const tier of tiers) {
     if (value >= tier) return table[tier];
   }
-  return 0; // Return 0 if below the lowest tier
+  return 0;
 };
 
-// For run time: Find the slowest valid tier the user achieved.
 const lookupRunTime = (table, userTimeSec) => {
   if (!table) return 0;
-  const tiers = Object.keys(table).map(time => [mmssToSec(time), table[time]]).sort((a, b) => a[0] - b[0]); // Sort ascending by time
+  const tiers = Object.keys(table).map(time => [mmssToSec(time), table[time]]).sort((a, b) => a[0] - b[0]);
   for (const [tierSec, points] of tiers) {
     if (userTimeSec <= tierSec) return points;
   }
-  return 0; // Return 0 if slower than the slowest tier
-};
-
-const WHTR_TABLE = {
-  "0.49": 20, "0.50": 19, "0.51": 18, "0.52": 17, "0.53": 16, "0.54": 15,
-  "0.55": 12.5, "0.56": 10, "0.57": 7.5, "0.58": 5, "0.59": 2.5, "0.60": 0
+  return 0;
 };
 
 const lookupWhtr = (waist, height) => {
     if (height === 0) return { pts: 0, ratio: "N/A", category: "Invalid Height" };
     const ratio = (waist / height).toFixed(2);
+    const WHTR_TABLE = PT_DATA.whtr;
     const tiers = Object.keys(WHTR_TABLE).map(Number).sort((a, b) => a - b);
     for (const tier of tiers) {
         if (ratio <= tier) {
@@ -174,9 +168,29 @@ const lookupWhtr = (waist, height) => {
 };
 
 // ========================================================================
-// DYNAMIC UI UPDATES
+// DYNAMIC UI UPDATES & INPUT FORMATTING
 // ========================================================================
-const updateInputLabel = (radioName, mappings) => {
+
+// NEW FUNCTION: Auto-adds a colon for time inputs
+const handleTimeInput = (event) => {
+    const input = event.target;
+    const id = input.id;
+    let isTimeField = false;
+
+    // Determine if the current input should be formatted as time
+    if (id === 'cardio-input' && document.querySelector('input[name="cardio"]:checked').value === 'run') {
+        isTimeField = true;
+    } else if (id === 'core-input' && document.querySelector('input[name="core"]:checked').value === 'plank') {
+        isTimeField = true;
+    }
+
+    if (isTimeField) {
+        // Get only the digits from the input
+        const digits = input.value.replace(/\D/g, '').substring(0, 4);
+        let formattedValue = digits;
+        if (digits.length > 2) {
+            // Insert colon after the first two digits
+            formattedValue = `${digits.substring(0, 2)}:${digits.substring(2)}`;const updateInputLabel = (radioName, mappings) => {
     document.querySelectorAll(`input[name="${radioName}"]`).forEach(radio => {
         radio.addEventListener('change', (e) => {
             const { label, placeholder, inputmode } = mappings[e.target.value];
@@ -185,8 +199,10 @@ const updateInputLabel = (radioName, mappings) => {
             if (labelEl) labelEl.textContent = label;
             if (inputEl) {
                 inputEl.placeholder = placeholder;
-                inputEl.value = ''; // Clear previous input on change
+                inputEl.value = '';
                 inputEl.inputmode = inputmode;
+                // Since the input type might change, we re-apply the correct type attribute
+                inputEl.type = (inputmode === 'numeric' && radioName !== 'core') ? 'number' : 'text';
             }
         });
     });
@@ -214,7 +230,7 @@ document.getElementById('ptForm').addEventListener('submit', (e) => {
     return;
   }
 
-  // --- 1. GET USER INPUT & CHOICES ---
+  // --- GET USER INPUT & CHOICES ---
   const gender = document.getElementById('gender').value;
   const age = parseInt(document.getElementById('age').value, 10);
   const waist = parseFloat(document.getElementById('waist').value);
@@ -228,7 +244,7 @@ document.getElementById('ptForm').addEventListener('submit', (e) => {
   const upperInput = parseInt(document.getElementById('upper-input').value, 10);
   const coreInput = document.getElementById('core-input').value;
 
-  // --- 2. VALIDATE INPUT ---
+  // --- VALIDATE INPUT ---
   if (isNaN(age) || isNaN(waist) || isNaN(height)) {
     return alert('Please fill out all Age, Waist, and Height fields with valid numbers.');
   }
@@ -238,32 +254,31 @@ document.getElementById('ptForm').addEventListener('submit', (e) => {
     return alert(`Sorry, scoring data for the ${gender}, age ${age} bracket is not available in the JSON file.`);
   }
 
-  // --- 3. CALCULATE POINTS FOR EACH COMPONENT ---
-  let cardioPts = 0;
-  let cardioDisplay = cardioInput;
+  // --- CALCULATE POINTS ---
+  let cardioPts = 0, cardioDisplay = cardioInput;
   if (cardioChoice === 'run') {
       if (!/^\d{1,2}:\d{2}$/.test(cardioInput)) return alert('Run time must be in mm:ss format.');
       cardioPts = lookupRunTime(bucketData.run, mmssToSec(cardioInput));
-  } else { // hamr
-      cardioPts = lookupNumeric(bucketData.run, parseInt(cardioInput, 10)); // HAMR uses the run table's point values
+  } else {
+      cardioPts = lookupNumeric(bucketData.run, parseInt(cardioInput, 10));
       cardioDisplay = `${parseInt(cardioInput, 10)} shuttles`;
   }
   
   const upperPts = lookupNumeric(bucketData[upperChoice], upperInput);
 
-  let corePts = 0;
-  let coreDisplay = coreInput;
+  let corePts = 0, coreDisplay = coreInput;
   if (coreChoice === 'plank') {
     if (!/^\d{1,2}:\d{2}$/.test(coreInput)) return alert('Plank time must be in mm:ss format.');
-    corePts = lookupNumeric(bucketData.plank, mmssToSec(coreInput));
-  } else { // situps or crunch
+    corePts = lookupRunTime(bucketData.plank, mmssToSec(coreInput)); // Plank is also a time lookup
+    coreDisplay = coreInput;
+  } else {
     corePts = lookupNumeric(bucketData[coreChoice], parseInt(coreInput, 10));
     coreDisplay = `${parseInt(coreInput, 10)} reps`;
   }
 
   const whtrInfo = lookupWhtr(waist, height);
 
-  // --- 4. CALCULATE TOTAL & CHECK MINIMUMS ---
+  // --- CALCULATE TOTAL & CHECK MINIMUMS ---
   const totalScore = cardioPts + upperPts + corePts + whtrInfo.pts;
   const mins = PT_DATA.minimumComponentValues;
   
@@ -275,9 +290,9 @@ document.getElementById('ptForm').addEventListener('submit', (e) => {
 
   const isPass = passedCardio && passedUpper && passedCore && passedWhtr && passedComposite;
 
-  // --- 5. DISPLAY RESULTS ---
+  // --- DISPLAY RESULTS ---
   const getResultLine = (label, display, points, passed) =>
-    `<p>${label} (${display}): <strong>${points} pts</strong> ${passed ? '✅' : '❌'}</p>`;
+    `<p>${label} (${display}): <strong>${points.toFixed(1)} pts</strong> ${passed ? '✅' : '❌'}</p>`;
 
   const outputDiv = document.getElementById('output');
   outputDiv.style.display = 'block';
