@@ -2,112 +2,99 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>USAF PT Score Calculator – 2‑Mile + WHtR</title>
+<title>USAF PT Demo</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
-  body {font-family:Arial,Helvetica,sans-serif; margin:0; padding:0 1rem; background:#f2f2f2;}
-  .wrapper {max-width:800px; margin:2rem auto; background:#fff; padding:1.5rem;
-            border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,.15);}
-  h1 {text-align:center; margin-bottom:1rem;}
-  form {display:flex; flex-direction:column; gap:1rem;}
-  label {display:flex; flex-direction:column; font-weight:600;}
-  input, select, button {width:100%; padding:.6rem; font-size:1rem;
-                         border:1px solid #999; border-radius:4px; box-sizing:border-box;}
-  button {background:#0066cc; color:#fff; cursor:pointer; font-weight:600;}
-  button:hover {background:#0055aa;}
-  .result {margin-top:2rem; padding:1rem; border:2px solid #444; background:#fafafa;}
-  .pass {color:#0a0; font-weight:bold;}
-  .fail {color:#c00; font-weight:bold;}
+  body{font-family:sans-serif;padding:1rem;}
+  label{display:block;margin-top:1rem;}
+  input,select{width:100%;padding:.5rem;}
+  button{margin-top:1rem;padding:.6rem;}
+  .result{margin-top:2rem;padding:1rem;border:2px solid #444;}
 </style>
 </head>
-
 <body>
-<div class="wrapper">
-  <h1>USAF PT Score Calculator</h1>
 
-  <form id="ptForm">
-    <label>Gender
-      <select id="gender" required>
-        <option value="male">Male</option>
-        <option value="female">Female</option>
-      </select>
-    </label>
+<h1>USAF PT Demo</h1>
+<form id="ptForm">
+  <label>Gender
+    <select id="gender"><option value="male">Male</option><option value="female">Female</option></select>
+  </label>
+  <label>Age <input type="number" id="age" required></label>
+  <label>2‑Mile Run (mm:ss) <input type="text" id="runTime" pattern="[0-9]{1,2}:[0-5][0-9]" required></label>
+  <label>Sit‑ups <input type="number" id="situps" required></label>
+  <label>Push‑ups <input type="number" id="pushups" required></label>
+  <label>Waist (in) <input type="number" id="waist" required></label>
+  <label>Height (in) <input type="number" id="height" required></label>
+  <button type="submit">Calculate</button>
+</form>
 
-    <label>Age (years)
-      <input type="number" id="age" min="17" max="80" required placeholder="e.g. 27">
-    </label>
-
-    <label>2‑Mile Run Time (mm:ss)
-      <input type="text" id="runTime"
-             placeholder="e.g. 13:45"
-             pattern="[0-9]{1,2}:[0-5][0-9]" required>
-    </label>
-
-    <label>Sit‑ups (1 min)
-      <input type="number" id="situps" min="0" required placeholder="e.g. 45">
-    </label>
-
-    <label>Push‑ups (1 min)
-      <input type="number" id="pushups" min="0" required placeholder="e.g. 30">
-    </label>
-
-    <!-- ==== NEW WHtR SECTION (inches) ==== -->
-    <h3>Waist‑to‑Height Ratio (WHtR)</h3>
-
-    <label>Waist (inches)
-      <input type="number" id="waist" min="10" max="80" required placeholder="e.g. 34">
-    </label>
-
-    <label>Height (inches)
-      <input type="number" id="height" min="48" max="84" required placeholder="e.g. 70">
-    </label>
-
-    <button type="submit">Calculate Score</button>
-  </form>
-
-  <div id="output" class="result" style="display:none;"></div>
-</div>
+<div id="out" class="result" style="display:none;"></div>
 
 <script>
-/* --------------------------------------------------------------
-   Helper functions
-   -------------------------------------------------------------- */
-function mmssToSec(str) {
-  const [m, s] = str.split(':').map(Number);
-  return m * 60 + s;
-}
-function getAgeBucket(age) {
-  if (age < 25) return "<25";
-  if (age <= 29) return "25-29";
-  if (age <= 34) return "30-34";
-  if (age <= 39) return "35-39";
-  if (age <= 44) return "40-44";
-  if (age <= 49) return "45-49";
-  if (age <= 54) return "50-54";
-  if (age <= 59) return "55-59";
+function mmssToSec(s){const [m,sec]=s.split(':').map(Number);return m*60+sec;}
+function getAgeBucket(a){
+  if(a<25) return "<25"; if(a<=29) return "25-29";
+  if(a<=34) return "30-34"; if(a<=39) return "35-39";
+  if(a<=44) return "40-44"; if(a<=49) return "45-49";
+  if(a<=54) return "50-54"; if(a<=59) return "55-59";
   return "60+";
 }
-function lookupNumeric(table, value) {
-  const keys = Object.keys(table).map(Number).sort((a,b)=>a-b);
-  let pts = 0;
-  for (let i = keys.length-1; i >= 0; i--) {
-    if (value >= keys[i]) { pts = table[keys[i]]; break; }
-  }
-  return pts;
+function lookupNumeric(tbl,val){
+  const keys=Object.keys(tbl).map(Number).sort((a,b)=>a-b);
+  for(let i=keys.length-1;i>=0;i--) if(val>=keys[i]) return tbl[keys[i]];
+  return 0;
 }
-function lookupRun(table, secs) {
-  const entries = Object.entries(table)
-    .map(([k,v])=>[mmssToSec(k),v])
-    .sort((a,b)=>a[0]-b[0]);               // ascending time
-  let pts = 0;
-  for (let i = entries.length-1; i >= 0; i--) {
-    if (secs <= entries[i][0]) { pts = entries[i][1]; break; }
-  }
-  return pts;
+function lookupRun(tbl,sec){
+  const rows=Object.entries(tbl).map(([k,v])=>[mmssToSec(k),v]).sort((a,b)=>a[0]-b[0]);
+  for(let i=rows.length-1;i>=0;i--) if(sec<=rows[i][0]) return rows[i][1];
+  return 0;
 }
+const WHR_TABLE={"0.49":20,"0.50":19,"0.51":18,"0.52":17,"0.53":16,"0.54":15,
+                "0.55":12.5,"0.56":10,"0.57":7.5,"0.58":5,"0.59":2.5,"0.60":0};
+function lookupWHR(w,h){
+  const r=(w/h).toFixed(2);
+  const keys=Object.keys(WHR_TABLE).map(Number).sort((a,b)=>a-b);
+  for(let i=keys.length-1;i>=0;i--) if(r<=keys[i]) return {pts:WHR_TABLE[keys[i].toFixed(2)],ratio:r};
+  return {pts:0,ratio:r};
+}
+let PT_DATA=null;
+fetch('usaf_pt_charts_clean.json')
+  .then(r=>r.json())
+  .then(d=>{PT_DATA=d; console.log('JSON loaded');})
+  .catch(e=>console.error('JSON load error',e));
 
-/* --------------------------------------------------------------
-   WHtR lookup – points & risk category (same for every bucket)
-   -------------------------------------------------------------- */
-const WHTR_TABLE = {
-  "0.49": 20, "0.50": 19
+document.getElementById('ptForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  if(!PT_DATA){alert('Data not loaded yet');return;}
+  const gender=document.getElementById('gender').value;
+  const age=+document.getElementById('age').value;
+  const run=document.getElementById('runTime').value.trim();
+  const sit=+document.getElementById('situps').value;
+  const push=+document.getElementById('pushups').value;
+  const waist=+document.getElementById('waist').value;
+  const height=+document.getElementById('height').value;
+
+  const bucket=getAgeBucket(age);
+  const bucketData=PT_DATA[gender][bucket];
+  if(!bucketData){alert('No bucket data');return;}
+
+  const runPts=lookupRun(bucketData.run,mmssToSec(run));
+  const sitPts=lookupNumeric(bucketData.situps,sit);
+  const pushPts=lookupNumeric(bucketData.pushups,push);
+  const whr=lookupWHR(waist,height);
+
+  const total=runPts+sitPts+pushPts+whr.pts;
+  const passed=total>=75 && runPts>=5 && sitPts>=4 && pushPts>=4 && whr.pts>=4;
+
+  const out=document.getElementById('out');
+  out.style.display='block';
+  out.innerHTML=`<p>Run: ${runPts} pts</p>
+                <p>Sit‑ups: ${sitPts} pts</p>
+                <p>Push‑ups: ${pushPts} pts</p>
+                <p>WHtR (${whr.ratio}): ${whr.pts} pts</p>
+                <p><strong>Total = ${total}</strong></p>
+                <p>${passed?'PASS':'FAIL'}</p>`;
+});
+</script>
+</body>
+</html>
