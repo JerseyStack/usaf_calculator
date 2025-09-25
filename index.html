@@ -32,33 +32,45 @@
         <option value="female">Female</option>
       </select>
     </label>
+
     <label>Age (years)
       <input type="number" id="age" min="17" max="80" required placeholder="e.g. 27">
     </label>
+
     <label>2‑Mile Run Time (mm:ss)
-      <input type="text" id="runTime" placeholder="e.g. 13:45"
+      <input type="text" id="runTime"
+             placeholder="e.g. 13:45"
              pattern="[0-9]{1,2}:[0-5][0-9]" required>
     </label>
+
     <label>Sit‑ups (1 min)
       <input type="number" id="situps" min="0" required placeholder="e.g. 45">
     </label>
+
     <label>Push‑ups (1 min)
       <input type="number" id="pushups" min="0" required placeholder="e.g. 30">
     </label>
+
     <h3>Waist‑to‑Height Ratio (WHtR)</h3>
+
     <label>Waist (inches)
       <input type="number" id="waist" min="10" max="80" required placeholder="e.g. 34">
     </label>
+
     <label>Height (inches)
       <input type="number" id="height" min="48" max="84" required placeholder="e.g. 70">
     </label>
+
     <button type="submit">Calculate Score</button>
   </form>
+
   <div id="output" class="result" style="display:none;"></div>
 </div>
 
 <script>
-/* ---------- Helper functions ---------- */
+/* --------------------------------------------------------------
+   Helper functions
+   -------------------------------------------------------------- */
 function mmssToSec(str) { const [m,s] = str.split(':').map(Number); return m*60 + s; }
 
 function getAgeBucket(age) {
@@ -73,7 +85,7 @@ function getAgeBucket(age) {
   return "60+";
 }
 
-/* numeric lookup – value must be >= the key */
+/* Numeric lookup – return the points for the greatest key ≤ value */
 function lookupNumeric(table, val) {
   const keys = Object.keys(table).map(Number).sort((a,b)=>a-b);
   let pts = 0;
@@ -83,7 +95,7 @@ function lookupNumeric(table, val) {
   return pts;
 }
 
-/* run‑time lookup – lower time = higher points */
+/* Run‑time lookup – return the points for the smallest time ≥ value */
 function lookupRun(table, secs) {
   const rows = Object.entries(table)
     .map(([k,v])=>[mmssToSec(k),v])
@@ -95,7 +107,9 @@ function lookupRun(table, secs) {
   return pts;
 }
 
-/* ---------- WHtR lookup (same ladder for everyone) ---------- */
+/* --------------------------------------------------------------
+   WHtR lookup – same ladder for every bucket
+   -------------------------------------------------------------- */
 const WHTR_TABLE = {
   "0.49":20,"0.50":19,"0.51":18,"0.52":17,"0.53":16,"0.54":15,
   "0.55":12.5,"0.56":10,"0.57":7.5,"0.58":5,"0.59":2.5,"0.60":0
@@ -117,10 +131,12 @@ function lookupWhtr(waist, height) {
   return {pts, ratio, category};
 }
 
-/* ---------- Load the JSON data ---------- */
+/* --------------------------------------------------------------
+   Load the JSON data (the file lives next to this HTML file)
+   -------------------------------------------------------------- */
 let PT_DATA = null;
 
-fetch('usaf_pt_charts_clean.json')          // adjust path if your file lives in a sub‑folder
+fetch('usaf_pt_charts_clean.json')
   .then(r => {
     if (!r.ok) throw new Error(`HTTP ${r.status}`);
     return r.json();
@@ -134,9 +150,12 @@ fetch('usaf_pt_charts_clean.json')          // adjust path if your file lives in
     alert('Failed to load PT data – check the console for details.');
   });
 
-/* ---------- Form submit ---------- */
+/* --------------------------------------------------------------
+   Form submit handler
+   -------------------------------------------------------------- */
 document.getElementById('ptForm').addEventListener('submit', e => {
   e.preventDefault();
+
   if (!PT_DATA) { alert('Data not loaded yet'); return; }
 
   const gender   = document.getElementById('gender').value;
@@ -147,7 +166,7 @@ document.getElementById('ptForm').addEventListener('submit', e => {
   const waist    = Number(document.getElementById('waist').value);
   const height   = Number(document.getElementById('height').value);
 
-  /* ---- basic validation ---- */
+  /* ----- basic validation ----- */
   if (!/^[0-9]{1,2}:[0-5][0-9]$/.test(runStr)) {
     return alert('Run time must be in mm:ss format (seconds 00‑59).');
   }
@@ -159,14 +178,14 @@ document.getElementById('ptForm').addEventListener('submit', e => {
   const bucketData = PT_DATA[gender][bucket];
   if (!bucketData) return alert(`No data for ${gender} age ${age}`);
 
-  /* ---- look‑ups ---- */
+  /* ----- look‑ups ----- */
   const runPts   = lookupRun(bucketData.run, mmssToSec(runStr));
   const sitPts   = lookupNumeric(bucketData.situps, situps);
   const pushPts  = lookupNumeric(bucketData.pushups, pushups);
   const whtrInfo = lookupWhtr(waist, height);   // {pts, ratio, category}
   const total    = runPts + sitPts + pushPts + whtrInfo.pts;
 
-  /* ---- component minimums (USAF rule) ---- */
+  /* ----- component minimums (USAF rule) ----- */
   const MIN_RUN  = 5;
   const MIN_MUSC = 4;   // push‑ups, sit‑ups, WHtR each need ≥ 4 pts
   const passed = (total >= 75) &&
@@ -175,7 +194,7 @@ document.getElementById('ptForm').addEventListener('submit', e => {
                  (pushPts  >= MIN_MUSC) &&
                  (whtrInfo.pts >= MIN_MUSC);
 
-  /* ---- display result ---- */
+  /* ----- display result ----- */
   const out = document.getElementById('output');
   out.style.display = 'block';
   out.innerHTML = `
