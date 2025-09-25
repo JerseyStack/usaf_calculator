@@ -2,70 +2,147 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>USAF PT Calculator (2‑Mile / WHtR version)</title>
+<title>USAF PT Score Calculator</title>
+
+<!-- 1️⃣  Tell mobile browsers to use the device width -->
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
 <style>
-  body {font-family: Arial, Helvetica, sans-serif; max-width: 800px; margin: 2rem auto; line-height: 1.5;}
-  h1 {text-align:center;}
-  label {display:block; margin-top:1rem;}
-  input, select {width:100%; padding:.5rem; font-size:1rem;}
-  button {margin-top:1.5rem; padding:.7rem 1.2rem; font-size:1rem;}
-  .result {margin-top:2rem; padding:1rem; border:2px solid #444; background:#f9f9f9;}
-  .pass {color:green; font-weight:bold;}
+  /* -----------------------------------------------------------
+     2️⃣  Global layout – a centered, fluid container
+     ----------------------------------------------------------- */
+  body {
+    font-family: Arial, Helvetica, sans-serif;
+    line-height: 1.5;
+    margin: 0;
+    padding: 0 1rem;
+    background:#f2f2f2;
+  }
+
+  .wrapper {
+    max-width: 800px;          /* never wider than desktop layout */
+    margin: 2rem auto;
+    background:#fff;
+    padding:1.5rem;
+    border-radius:8px;
+    box-shadow:0 2px 8px rgba(0,0,0,.15);
+  }
+
+  h1 {
+    text-align:center;
+    margin-bottom:1.5rem;
+    font-size:1.8rem;
+  }
+
+  /* -----------------------------------------------------------
+     3️⃣  Form – flex column, full‑width controls
+     ----------------------------------------------------------- */
+  form {
+    display:flex;
+    flex-direction:column;
+    gap:1rem;
+  }
+
+  label {
+    display:flex;
+    flex-direction:column;
+    font-weight:600;
+  }
+
+  input,
+  select,
+  button {
+    width:100%;                     /* fill the column */
+    padding:.6rem;
+    font-size:1rem;
+    border:1px solid #999;
+    border-radius:4px;
+    box-sizing:border-box;
+  }
+
+  button {
+    margin-top:1rem;
+    background:#0066cc;
+    color:#fff;
+    cursor:pointer;
+    font-weight:600;
+  }
+
+  button:hover {background:#0055aa;}
+
+  /* -----------------------------------------------------------
+     4️⃣  Result box
+     ----------------------------------------------------------- */
+  .result {
+    margin-top:2rem;
+    padding:1rem;
+    border:2px solid #444;
+    background:#fafafa;
+    font-size:1.1rem;
+  }
+
+  .pass {color:#0a0; font-weight:bold;}
   .fail {color:#c00; font-weight:bold;}
+
+  /* -----------------------------------------------------------
+     5️⃣  Media queries – optional fine‑tuning for very small screens
+     ----------------------------------------------------------- */
+  @media (max-width: 380px) {
+    h1 {font-size:1.5rem;}
+    input, select, button {font-size:.95rem;}
+  }
 </style>
 </head>
+
 <body>
+<div class="wrapper">
+  <h1>USAF PT Score Calculator</h1>
 
-<h1>USAF PT Score Calculator</h1>
+  <form id="ptForm">
+    <label>
+      Gender
+      <select id="gender" required>
+        <option value="male">Male</option>
+        <option value="female">Female</option>
+      </select>
+    </label>
 
-<form id="ptForm">
-  <label>
-    Gender
-    <select id="gender" required>
-      <option value="male">Male</option>
-      <option value="female">Female</option>
-    </select>
-  </label>
+    <label>
+      Age (years)
+      <input type="number" id="age" min="17" max="80" required placeholder="e.g. 27">
+    </label>
 
-  <label>
-    Age (years)
-    <input type="number" id="age" min="17" max="80" required>
-  </label>
+    <label>
+      2‑Mile Run Time (mm:ss)
+      <input type="text" id="runTime" placeholder="e.g. 13:45" pattern="\\d{1,2}:\\d{2}" required>
+    </label>
 
-  <label>
-    2‑Mile Run Time (mm:ss)
-    <input type="text" id="runTime" placeholder="e.g. 13:45" required pattern="\\d{1,2}:\\d{2}">
-  </label>
+    <label>
+      Sit‑ups (1 min)
+      <input type="number" id="situps" min="0" required placeholder="e.g. 45">
+    </label>
 
-  <label>
-    Sit‑ups (1 min)
-    <input type="number" id="situps" min="0" required>
-  </label>
+    <label>
+      Push‑ups (1 min)
+      <input type="number" id="pushups" min="0" required placeholder="e.g. 30">
+    </label>
 
-  <label>
-    Push‑ups (1 min)
-    <input type="number" id="pushups" min="0" required>
-  </label>
+    <button type="submit">Calculate Score</button>
+  </form>
 
-  <button type="submit">Calculate Score</button>
-</form>
-
-<div id="output" class="result" style="display:none;"></div>
+  <div id="output" class="result" style="display:none;"></div>
+</div>
 
 <script>
-/* --------------------------------------------------------------
-   Helper functions
-   -------------------------------------------------------------- */
+/* -----------------------------------------------------------
+   6️⃣  Helper utilities
+   ----------------------------------------------------------- */
 function mmssToSec(str) {
   const [m, s] = str.split(':').map(Number);
   return m * 60 + s;
 }
 
-/* Return the age bucket string that exists in the JSON.
-   The JSON uses the following buckets:
-   "<25", "25-29", "30-34", "35-39", "40-44",
-   "45-49", "50-54", "55-59", "60+" (or "60+" for >60)
-*/
+/* Age‑bucket selector – must match the exact keys in the JSON */
 function getAgeBucket(age) {
   if (age < 25) return "<25";
   if (age <= 29) return "25-29";
@@ -78,10 +155,7 @@ function getAgeBucket(age) {
   return "60+";
 }
 
-/* Look up a numeric‑valued table (sit‑ups, push‑ups).
-   The JSON stores the exact number of reps as keys.
-   If the exact key does not exist we return the *next lower* bucket.
-*/
+/* Lookup a numeric table (sit‑ups, push‑ups) – nearest lower bucket */
 function lookupNumeric(table, value) {
   const keys = Object.keys(table).map(Number).sort((a,b)=>a-b);
   let pts = 0;
@@ -91,97 +165,84 @@ function lookupNumeric(table, value) {
   return pts;
 }
 
-/* Look up the run‑time table.
-   The JSON stores the *fastest* times that earn a given point value.
-   We convert everything to seconds and find the *largest* threshold
-   that is ≤ the user’s time (faster = more points).                     */
-function lookupRun(table, timeSec) {
+/* Run‑time lookup – larger time = lower points (fastest = most points) */
+function lookupRun(table, secs) {
   const entries = Object.entries(table)
     .map(([k,v]) => [mmssToSec(k), v])
     .sort((a,b)=>a[0]-b[0]);               // ascending time
 
   let pts = 0;
   for (let i = entries.length-1; i >= 0; i--) {
-    if (timeSec <= entries[i][0]) { pts = entries[i][1]; break; }
+    if (secs <= entries[i][0]) { pts = entries[i][1]; break; }
   }
   return pts;
 }
 
-/* --------------------------------------------------------------
-   Main logic – load JSON, handle form submit
-   -------------------------------------------------------------- */
+/* -----------------------------------------------------------
+   7️⃣  Load the JSON data
+   ----------------------------------------------------------- */
 let PT_DATA = null;
-
-// --------------------------------------------------------------
-// 1️⃣ Load the JSON file (make sure the file is served with CORS)
-// --------------------------------------------------------------
 fetch('usaf_pt_charts_clean.json')
   .then(r => {
-    if (!r.ok) throw new Error('Network response was not ok');
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
     return r.json();
   })
   .then(data => { PT_DATA = data; })
   .catch(err => {
-    console.error('Could not load PT data:', err);
+    console.error('Failed to load PT data:', err);
     alert('Failed to load PT data – check the console for details.');
   });
 
-// --------------------------------------------------------------
-// 2️⃣ Form submit handler
-// --------------------------------------------------------------
-document.getElementById('ptForm').addEventListener('submit', function(e){
+/* -----------------------------------------------------------
+   8️⃣  Form submit handler
+   ----------------------------------------------------------- */
+document.getElementById('ptForm').addEventListener('submit', e => {
   e.preventDefault();
   if (!PT_DATA) return alert('Data not loaded yet.');
 
-  const gender   = document.getElementById('gender').value;
-  const age      = Number(document.getElementById('age').value);
-  const runStr   = document.getElementById('runTime').value.trim();
-  const situps   = Number(document.getElementById('situps').value);
-  const pushups  = Number(document.getElementById('pushups').value);
+  const gender  = document.getElementById('gender').value;
+  const age     = Number(document.getElementById('age').value);
+  const runStr  = document.getElementById('runTime').value.trim();
+  const situps  = Number(document.getElementById('situps').value);
+  const pushups = Number(document.getElementById('pushups').value);
 
-  // ---- validation -------------------------------------------------
+  // ---- basic validation -------------------------------------------------
   if (!/^\d{1,2}:\d{2}$/.test(runStr)) {
     return alert('Run time must be in mm:ss format.');
   }
 
-  // ---- find correct bucket ----------------------------------------
   const bucket = getAgeBucket(age);
   const genderData = PT_DATA[gender];
   if (!genderData || !genderData[bucket]) {
-    return alert(`No data for ${gender} age ${age} (bucket ${bucket})`);
+    return alert(`No scoring table for ${gender} age ${age} (bucket ${bucket})`);
   }
 
-  const runTable    = genderData[bucket].run;
-  const sitTable    = genderData[bucket].situps;
-  const pushTable   = genderData[bucket].pushups;
+  // ---- look up points ----------------------------------------------------
+  const runPts   = lookupRun(genderData[bucket].run, mmssToSec(runStr));
+  const sitPts   = lookupNumeric(genderData[bucket].situps, situps);
+  const pushPts  = lookupNumeric(genderData[bucket].pushups, pushups);
 
-  // ---- look up points ----------------------------------------------
-  const runPts   = lookupRun(runTable, mmssToSec(runStr));
-  const sitPts   = lookupNumeric(sitTable, situps);
-  const pushPts  = lookupNumeric(pushTable, pushups);
-
-  // ---- composite & pass/fail ---------------------------------------
   const total = runPts + sitPts + pushPts;
-  const MIN_RUN   = 5;   // from the official tables (≥5 pts = pass) (Source: PDF)
-  const MIN_MUSC  = 4;   // push‑ups & sit‑ups minimum (Source: PDF)
 
+  // ---- minimum‑component check (USAF rule: run ≥5, each muscular ≥4) -----
+  const MIN_RUN   = 5;
+  const MIN_MUSC  = 4;
   const passed = (total >= 75) && (runPts >= MIN_RUN) && (sitPts >= MIN_MUSC) && (pushPts >= MIN_MUSC);
 
-  // ---- output -------------------------------------------------------
-  const outDiv = document.getElementById('output');
-  outDiv.style.display = 'block';
-  outDiv.innerHTML = `
-    <h2>Result for ${gender.toUpperCase()}, Age ${age}</h2>
+  // ---- display -----------------------------------------------------------
+  const out = document.getElementById('output');
+  out.style.display = 'block';
+  out.innerHTML = `
+    <h2>Result (${gender.toUpperCase()}, Age ${age})</h2>
     <p><strong>Run (2‑mile) :</strong> ${runStr} → <strong>${runPts}</strong> pts</p>
-    <p><strong>Sit‑ups (1 min) :</strong> ${situps} → <strong>${sitPts}</strong> pts</p>
-    <p><strong>Push‑ups (1 min) :</strong> ${pushups} → <strong>${pushPts}</strong> pts</p>
+    <p><strong>Sit‑ups :</strong> ${situps} → <strong>${sitPts}</strong> pts</p>
+    <p><strong>Push‑ups :</strong> ${pushups} → <strong>${pushPts}</strong> pts</p>
     <p><strong>Total :</strong> ${total} pts</p>
     <p class="${passed ? 'pass' : 'fail'}">
-      ${passed ? 'PASS – you meet the composite and minimum‑component requirements' : 'FAIL – you did not meet the required thresholds'}
+      ${passed ? 'PASS – you meet the composite & component minimums' : 'FAIL – you did not meet the required thresholds'}
     </p>
   `;
 });
 </script>
-
 </body>
 </html>
