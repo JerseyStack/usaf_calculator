@@ -23,7 +23,7 @@
   .fail {color:#c00;font-weight:bold;}
   @media (max-width:380px){
     h1{font-size:1.5rem}
-    select, button{font-size:.95rem}
+    select,button{font-size:.95rem}
   }
 </style>
 </head>
@@ -33,9 +33,10 @@
 
   <form id="ptForm">
 
-    <!-- ====================== GENDER & AGE ====================== -->
+    <!-- ====================== DEMOGRAPHICS ====================== -->
     <fieldset>
       <legend>Demographics</legend>
+
       <label>Gender
         <select id="gender" required>
           <option value="male">Male</option>
@@ -48,32 +49,35 @@
       </label>
     </fieldset>
 
-    <!-- ====================== CARDIO SECTION ====================== -->
+    <!-- ====================== CARDIO ====================== -->
     <fieldset>
       <legend>Cardio – Choose ONE</legend>
 
       <label><input type="radio" name="cardio" value="run" checked> 2‑Mile Run</label>
       <label><input type="radio" name="cardio" value="hamr"> HAMR (20‑m Shuttle)</label>
 
-      <!-- Run dropdown (visible when “run” radio is selected) -->
+      <!-- 2‑Mile Run dropdown -->
       <select id="runSelect" class="test-select"></select>
 
-      <!-- HAMR dropdown (visible when “hamr” radio is selected) -->
+      <!-- HAMR dropdown (same data, different label) -->
       <select id="hamrSelect" class="test-select" style="display:none;"></select>
     </fieldset>
 
-    <!-- ====================== PUSH‑UPS SECTION ====================== -->
+    <!-- ====================== UPPER‑BODY ====================== -->
     <fieldset>
       <legend>Upper‑Body – Choose ONE</legend>
 
       <label><input type="radio" name="push" value="pushups" checked> Push‑ups (1 min)</label>
       <label><input type="radio" name="push" value="handRelease"> Hand‑Release Push‑ups (2 min)</label>
 
+      <!-- Push‑ups dropdown -->
       <select id="pushSelect" class="test-select"></select>
+
+      <!-- Hand‑Release dropdown (identical table) -->
       <select id="handSelect" class="test-select" style="display:none;"></select>
     </fieldset>
 
-    <!-- ====================== CORE SECTION ====================== -->
+    <!-- ====================== CORE ====================== -->
     <fieldset>
       <legend>Core – Choose ONE</legend>
 
@@ -81,8 +85,13 @@
       <label><input type="radio" name="core" value="crunch"> Reverse Crunch (2 min)</label>
       <label><input type="radio" name="core" value="plank"> Forearm Plank (seconds)</label>
 
+      <!-- Sit‑ups dropdown -->
       <select id="sitSelect" class="test-select"></select>
+
+      <!-- Reverse Crunch dropdown (same table) -->
       <select id="crunchSelect" class="test-select" style="display:none;"></select>
+
+      <!-- Forearm Plank dropdown – shown as mm:ss -->
       <select id="plankSelect" class="test-select" style="display:none;"></select>
     </fieldset>
 
@@ -107,6 +116,12 @@
    Helper functions
    -------------------------------------------------------------- */
 function mmssToSec(str){ const [m,s] = str.split(':').map(Number); return m*60+s; }
+
+function secToMmss(sec){
+  const m = Math.floor(sec/60);
+  const s = sec % 60;
+  return `${m}:${s.toString().padStart(2,'0')}`;
+}
 
 function getAgeBucket(age){
   if (age < 25) return "<25";
@@ -175,7 +190,7 @@ fetch('usaf_pt_charts_clean.json')
   .then(data => {
     PT_DATA = data;
     console.log('✅ PT data loaded');
-    buildAllDropdowns();                 // Populate every select once we have the data
+    populateAllSelects();          // fill every dropdown once data is ready
   })
   .catch(err => {
     console.error('❌ Failed to load PT data:', err);
@@ -183,91 +198,79 @@ fetch('usaf_pt_charts_clean.json')
   });
 
 /* --------------------------------------------------------------
-   Populate every dropdown (run, hamr, push‑ups, hand‑release, …)
+   Populate every dropdown from the JSON
    -------------------------------------------------------------- */
-function buildAllDropdowns(){
+function populateAllSelects(){
   const gender = document.getElementById('gender').value;
   const age    = Number(document.getElementById('age').value) || 20; // provisional
   const bucket = getAgeBucket(age);
   const bucketData = PT_DATA[gender][bucket];
 
-  // ----- Run -----
+  /* ---------- Run / HAMR ---------- */
   const runSel = document.getElementById('runSelect');
-  runSel.innerHTML = '';
+  const hamrSel = document.getElementById('hamrSelect');
+  runSel.innerHTML = hamrSel.innerHTML = '';
   for (const t of Object.keys(bucketData.run).sort((a,b)=>mmssToSec(a)-mmssToSec(b))) {
     const opt = document.createElement('option');
     opt.value = t;
     opt.textContent = `${t} (${bucketData.run[t]} pts)`;
     runSel.appendChild(opt);
+    // HAMR uses the same table – we just clone the option
+    const hamrOpt = opt.cloneNode(true);
+    hamrSel.appendChild(hamrOpt);
   }
 
-  // ----- HAMR (same table as run, just displayed as “shuttle count”) -----
-  const hamrSel = document.getElementById('hamrSelect');
-  hamrSel.innerHTML = '';
-  for (const t of Object.keys(bucketData.run).sort((a,b)=>mmssToSec(a)-mmssToSec(b))) {
-    // Convert the run‑time to an approximate shuttle count for display.
-    // The PDF gives a range; we simply reuse the same values.
-    const opt = document.createElement('option');
-    opt.value = t;                // keep the same value – lookupRun works on seconds
-    opt.textContent = `${t} (${bucketData.run[t]} pts)`;
-    hamrSel.appendChild(opt);
-  }
-
-  // ----- Push‑ups -----
+  /* ---------- Push‑ups / Hand‑Release ---------- */
   const pushSel = document.getElementById('pushSelect');
-  pushSel.innerHTML = '';
+  const handSel = document.getElementById('handSelect');
+  pushSel.innerHTML = handSel.innerHTML = '';
   for (const rep of Object.keys(bucketData.pushups).sort((a,b)=>Number(a)-Number(b))) {
     const opt = document.createElement('option');
     opt.value = rep;
     opt.textContent = `${rep} reps (${bucketData.pushups[rep]} pts)`;
     pushSel.appendChild(opt);
+    handSel.appendChild(opt.cloneNode(true));   // identical table
   }
 
-  // ----- Hand‑Release -----
-  const handSel = document.getElementById('handSelect');
-  handSel.innerHTML = pushSel.innerHTML;   // same table for males/females
-
-  // ----- Sit‑ups -----
+  /* ---------- Sit‑ups / Reverse Crunch ---------- */
   const sitSel = document.getElementById('sitSelect');
-  sitSel.innerHTML = '';
+  const crunchSel = document.getElementById('crunchSelect');
+  sitSel.innerHTML = crunchSel.innerHTML = '';
   for (const rep of Object.keys(bucketData.situps).sort((a,b)=>Number(a)-Number(b))) {
     const opt = document.createElement('option');
     opt.value = rep;
     opt.textContent = `${rep} reps (${bucketData.situps[rep]} pts)`;
     sitSel.appendChild(opt);
+    crunchSel.appendChild(opt.cloneNode(true)); // same table
   }
 
-  // ----- Reverse Crunch (same table as sit‑ups) -----
-  const crunchSel = document.getElementById('crunchSelect');
-  crunchSel.innerHTML = sitSel.innerHTML;
-
-  // ----- Plank -----
+  /* ---------- Forearm Plank (show mm:ss) ---------- */
   const plankSel = document.getElementById('plankSelect');
   plankSel.innerHTML = '';
   for (const sec of Object.keys(bucketData.plank).sort((a,b)=>Number(a)-Number(b))) {
     const opt = document.createElement('option');
-    opt.value = sec;
-    opt.textContent = `${sec} sec (${bucketData.plank[sec]} pts)`;
+    opt.value = sec;                                   // raw seconds for lookup
+    opt.textContent = `${secToMmss(Number(sec))} (${bucketData.plank[sec]} pts)`;
     plankSel.appendChild(opt);
   }
 }
 
 /* --------------------------------------------------------------
-   Show / hide the correct dropdown when a radio button changes
+   Show / hide the correct dropdown when a radio changes
    -------------------------------------------------------------- */
-function bindRadioVisibility(radioName, mapping){
+function bindVisibility(radioName, mapping){
   const radios = document.querySelectorAll(`input[name="${radioName}"]`);
   radios.forEach(r => r.addEventListener('change', () => {
-    Object.entries(mapping).forEach(([value, selectId]) => {
-      document.getElementById(selectId).style.display = (r.value === value) ? 'block' : 'none';
+    Object.entries(mapping).forEach(([val, selId]) => {
+      document.getElementById(selId).style.display = (r.value === val) ? 'block' : 'none';
     });
   }));
 }
 
-/* Bind visibility logic for the three sections */
-bindRadioVisibility('cardio', {run:'runSelect', hamr:'hamrSelect'});
-bindRadioVisibility('push',   {pushups:'pushSelect', handRelease:'handSelect'});
-bindRadioVisibility('core',   {situps:'sitSelect', crunch:'crunchSelect', plank:'plankSelect'});
+/* Bind the three sections */
+bindVisibility('cardio', {run:'runSelect', hamr:'hamrSelect'});
+bindVisibility('push',   {pushups:'pushSelect', handRelease:'handSelect'});
+bindVisibility('core',   {situps:'sitSelect', crunch:'crunchSelect', plank:'plankSelect'});
 
 /* --------------------------------------------------------------
    Form submit – calculate the PT score
@@ -282,26 +285,26 @@ document.getElementById('ptForm').addEventListener('submit', e => {
   const bucketData = PT_DATA[gender][bucket];
   if (!bucketData) return alert(`No data for ${gender} age ${age}`);
 
-  /* ----- Determine which test was chosen in each section ----- */
+  /* ----- Which test was chosen in each section? ----- */
   const cardioChoice = document.querySelector('input[name="cardio"]:checked').value;
   const pushChoice   = document.querySelector('input[name="push"]:checked').value;
   const coreChoice   = document.querySelector('input[name="core"]:checked').value;
 
-  /* ----- Pull the selected values from the appropriate dropdowns ----- */
+  /* ----- Pull the selected values from the proper dropdowns ----- */
   const runStr   = cardioChoice === 'run'   ? document.getElementById('runSelect').value
-                                                : document.getElementById('hamrSelect').value;
+                                                    : document.getElementById('hamrSelect').value;
   const pushVal  = pushChoice   === 'pushups' ? Number(document.getElementById('pushSelect').value)
-                                                : Number(document.getElementById('handSelect').value);
+                                                    : Number(document.getElementById('handSelect').value);
   const sitVal   = coreChoice   === 'situps'  ? Number(document.getElementById('sitSelect').value)
-                                                : coreChoice === 'crunch' ? Number(document.getElementById('crunchSelect').value)
-                                                : 0;                     // plank uses a different scale
+                                                    : coreChoice === 'crunch' ? Number(document.getElementById('crunchSelect').value)
+                                                    : 0; // plank case
   const plankSec = coreChoice   === 'plank'   ? Number(document.getElementById('plankSelect').value)
-                                                : 0;
+                                                    : 0;
 
   const waist    = Number(document.getElementById('waist').value);
   const height   = Number(document.getElementById('height').value);
 
-  /* ----- Basic validation ----- */
+  /* ----- Validation ----- */
   if (!/^[0-9]{1,2}:[0-5][0-9]$/.test(runStr)) {
     return alert('Run/HAMR time must be in mm:ss format (seconds 00‑59).');
   }
@@ -314,10 +317,10 @@ document.getElementById('ptForm').addEventListener('submit', e => {
   const pushPts  = lookupNumeric(bucketData.pushups, pushVal);
   const sitPts   = coreChoice === 'plank' ? 0 : lookupNumeric(bucketData.situps, sitVal);
   const plankPts = coreChoice === 'plank' ? lookupNumeric(bucketData.plank, plankSec) : 0;
-  const whtrInfo = lookupWhtr(waist, height);   // {pts, ratio, category}
+  const whtrInfo = lookupWhtr(waist, height);          // {pts, ratio, category}
   const total = runPts + pushPts + sitPts + plankPts + whtrInfo.pts;
 
-  /* ----- Apply Minimum‑Component thresholds from JSON ----- */
+  /* ----- Minimum component thresholds (from JSON) ----- */
   const mins = PT_DATA.minimumComponentValues;
   const passed = (total >= PT_DATA.compositeCategories.satisfactoryMin) &&
                  (runPts   >= mins.run) &&
@@ -332,11 +335,11 @@ document.getElementById('ptForm').addEventListener('submit', e => {
   out.innerHTML = `
     <h2>Result (${gender.toUpperCase()}, Age ${age})</h2>
     <p><strong>Run / HAMR (${runStr}):</strong> ${runPts} pts</p>
-    <p><strong>${pushChoice === 'pushups' ? 'Push‑ups' : 'Hand‑Release'}:</strong> ${pushVal} reps → ${pushPts} pts</p>
+    <p><strong>${pushChoice === 'pushups' ? 'Push‑ups' : 'Hand‑Release'} (${pushVal} reps):</strong> ${pushPts} pts</p>
     <p><strong>${coreChoice === 'situps' ? 'Sit‑ups' :
-                coreChoice === 'crunch' ? 'Reverse Crunch' : 'Plank'}:</strong>
-        ${coreChoice === 'plank' ? plankSec + ' sec' : sitVal + ' reps'}
-        → ${coreChoice === 'plank' ? plankPts : sitPts} pts</p>
+                coreChoice === 'crunch' ? 'Reverse Crunch' : 'Forearm Plank'}:
+            ${coreChoice === 'plank' ? secToMmss(plankSec) + ' sec' : sitVal + ' reps'}
+            → <strong>${coreChoice === 'plank' ? plankPts : sitPts}</strong> pts</p>
     <p><strong>WHtR (${whtrInfo.ratio} – ${whtrInfo.category}):</strong> ${whtrInfo.pts} pts</p>
     <p><strong>Total:</strong> ${total} pts</p>
     <p class="${passed ? 'pass' : 'fail'}">
