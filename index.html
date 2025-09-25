@@ -6,17 +6,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
   body {font-family:Arial,Helvetica,sans-serif;margin:0;padding:0 1rem;background:#f2f2f2;}
-  .wrapper {max-width:800px;margin:2rem auto;background:#fff;padding:1.5rem;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.15);}
+  .wrapper {max-width:800px;margin:2rem auto;background:#fff;padding:1.5rem;border-radius:8px;
+           box-shadow:0 2px 8px rgba(0,0,0,.15);}
   h1 {text-align:center;margin-bottom:1.5rem;}
   form {display:flex;flex-direction:column;gap:1rem;}
   label {display:flex;flex-direction:column;font-weight:600;}
-  input, select, button {width:100%;padding:.6rem;font-size:1rem;border:1px solid #999;border-radius:4px;box-sizing:border-box;}
+  input, select, button {width:100%;padding:.6rem;font-size:1rem;
+                         border:1px solid #999;border-radius:4px;box-sizing:border-box;}
   button {background:#0066cc;color:#fff;cursor:pointer;font-weight:600;}
   button:hover {background:#0055aa;}
   .result {margin-top:2rem;padding:1rem;border:2px solid #444;background:#fafafa;}
   .pass {color:#0a0;font-weight:bold;}
   .fail {color:#c00;font-weight:bold;}
   .toggle {display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem;}
+  .selectOnly {display:none;}
   @media (max-width:380px){
     h1{font-size:1.5rem}
     input,select,button{font-size:.95rem}
@@ -27,7 +30,7 @@
 <div class="wrapper">
   <h1>USAF PT Calculator</h1>
 
-  <!-- ---------- Mobile toggle ---------- -->
+  <!-- ===== Mobile toggle ===== -->
   <div class="toggle">
     <input type="checkbox" id="useSelects" checked>
     <label for="useSelects">Use dropdowns (mobile‑friendly)</label>
@@ -46,58 +49,57 @@
       <input type="number" id="age" min="17" max="80" required placeholder="e.g. 27">
     </label>
 
-    <!-- ---------- Run / HAMR ---------- -->
+    <!-- ==== RUN / HAMR ==== -->
     <div id="runSection">
-      <label>2‑Mile Run (mm:ss) – or HAMR (seconds)
+      <label class="typeOnly">2‑Mile Run (mm:ss) – or HAMR (shuttle count)
         <input type="text" id="runTime"
                placeholder="e.g. 13:45"
                pattern="[0-9]{1,2}:[0-5][0-9]" required>
       </label>
 
-      <label class="selectOnly" style="display:none;">Run / HAMR (select)
+      <label class="selectOnly">Run / HAMR (select)
         <select id="runSelect"></select>
       </label>
     </div>
 
-    <!-- ---------- Push‑ups / Hand‑Release ---------- -->
+    <!-- ==== PUSH‑UPS / HAND‑RELEASE ==== -->
     <div id="pushSection">
-      <label>Push‑ups (1 min) / Hand‑Release (2 min)
+      <label class="typeOnly">Push‑ups (1 min) / Hand‑Release (2 min)
         <input type="number" id="pushups" min="0" required placeholder="e.g. 30">
       </label>
 
-      <label class="selectOnly" style="display:none;">Push‑ups / Hand‑Release (select)
+      <label class="selectOnly">Push‑ups / Hand‑Release (select)
         <select id="pushSelect"></select>
       </label>
     </div>
 
-    <!-- ---------- Sit‑ups / Reverse Crunch ---------- -->
+    <!-- ==== SIT‑UPS / REVERSE‑CRUNCH ==== -->
     <div id="sitSection">
-      <label>Sit‑ups (1 min) / Reverse Crunch (2 min)
+      <label class="typeOnly">Sit‑ups (1 min) / Reverse Crunch (2 min)
         <input type="number" id="situps" min="0" required placeholder="e.g. 45">
       </label>
 
-      <label class="selectOnly" style="display:none;">Sit‑ups / Reverse Crunch (select)
+      <label class="selectOnly">Sit‑ups / Reverse Crunch (select)
         <select id="sitSelect"></select>
       </label>
     </div>
 
-    <!-- ---------- Plank ---------- -->
+    <!-- ==== FOREARM PLANK ==== -->
     <div id="plankSection">
-      <label>Forearm Plank (seconds)
+      <label class="typeOnly">Forearm Plank (seconds)
         <input type="number" id="plank" min="0" required placeholder="e.g. 120">
       </label>
 
-      <label class="selectOnly" style="display:none;">Plank (select)
+      <label class="selectOnly">Plank (select)
         <select id="plankSelect"></select>
       </label>
     </div>
 
-    <!-- ---------- WHtR ---------- -->
+    <!-- ==== WHtR ==== -->
     <h3>Waist‑to‑Height Ratio (WHtR)</h3>
     <label>Waist (inches)
       <input type="number" id="waist" min="10" max="80" required placeholder="e.g. 34">
     </label>
-
     <label>Height (inches)
       <input type="number" id="height" min="48" max="84" required placeholder="e.g. 70">
     </label>
@@ -112,8 +114,8 @@
 /* --------------------------------------------------------------
    Helper functions
    -------------------------------------------------------------- */
-function mmssToSec(str){ const [m,s] = str.split(':').map(Number); return m*60+s; }
-function secToMmss(sec){ const m = Math.floor(sec/60); const s = sec%60; return `${m}:${s.toString().padStart(2,'0')}`; }
+function mmssToSec(str){ const [m,s]=str.split(':').map(Number); return m*60+s; }
+function secToMmss(sec){ const m=Math.floor(sec/60); const s=sec%60; return `${m}:${s.toString().padStart(2,'0')}`; }
 
 function getAgeBucket(age){
   if (age < 25) return "<25";
@@ -182,7 +184,7 @@ fetch('usaf_pt_charts_clean.json')
   .then(data => {
     PT_DATA = data;
     console.log('✅ PT data loaded');
-    populateSelects();               // <-- fill all dropdowns once data is ready
+    populateSelects();                 // fill dropdowns once the data is ready
   })
   .catch(err => {
     console.error('❌ Failed to load PT data:', err);
@@ -194,11 +196,11 @@ fetch('usaf_pt_charts_clean.json')
    -------------------------------------------------------------- */
 function populateSelects(){
   const gender = document.getElementById('gender').value;
-  const age = Number(document.getElementById('age').value) || 20;   // fallback for early load
+  const age    = Number(document.getElementById('age').value) || 20; // fallback while typing
   const bucket = getAgeBucket(age);
   const bucketData = PT_DATA[gender][bucket];
 
-  // ----- Run / HAMR -----
+  /* ---- Run / HAMR ---- */
   const runSel = document.getElementById('runSelect');
   runSel.innerHTML = '';
   for (const t of Object.keys(bucketData.run).sort((a,b)=>mmssToSec(a)-mmssToSec(b))) {
@@ -208,29 +210,27 @@ function populateSelects(){
     runSel.appendChild(opt);
   }
 
-  // ----- Push‑ups / Hand‑Release -----
+  /* ---- Push‑ups / Hand‑Release ---- */
   const pushSel = document.getElementById('pushSelect');
   pushSel.innerHTML = '';
-  const pushTable = gender === 'male' ? bucketData.pushups : bucketData.pushups; // same key name in JSON
-  for (const rep of Object.keys(pushTable).sort((a,b)=>Number(a)-Number(b))) {
+  for (const rep of Object.keys(bucketData.pushups).sort((a,b)=>Number(a)-Number(b))) {
     const opt = document.createElement('option');
     opt.value = rep;
-    opt.textContent = `${rep} reps (${pushTable[rep]} pts)`;
+    opt.textContent = `${rep} reps (${bucketData.pushups[rep]} pts)`;
     pushSel.appendChild(opt);
   }
 
-  // ----- Sit‑ups / Reverse Crunch -----
+  /* ---- Sit‑ups / Reverse Crunch ---- */
   const sitSel = document.getElementById('sitSelect');
   sitSel.innerHTML = '';
-  const sitTable = gender === 'male' ? bucketData.situps : bucketData.situps;
-  for (const rep of Object.keys(sitTable).sort((a,b)=>Number(a)-Number(b))) {
+  for (const rep of Object.keys(bucketData.situps).sort((a,b)=>Number(a)-Number(b))) {
     const opt = document.createElement('option');
     opt.value = rep;
-    opt.textContent = `${rep} reps (${sitTable[rep]} pts)`;
+    opt.textContent = `${rep} reps (${bucketData.situps[rep]} pts)`;
     sitSel.appendChild(opt);
   }
 
-  // ----- Plank -----
+  /* ---- Plank ---- */
   const plankSel = document.getElementById('plankSelect');
   plankSel.innerHTML = '';
   for (const sec of Object.keys(bucketData.plank).sort((a,b)=>Number(a)-Number(b))) {
@@ -242,15 +242,14 @@ function populateSelects(){
 }
 
 /* --------------------------------------------------------------
-   Toggle between “type‑in” and “select” UI
+   Toggle between “type‑in” and “select” UI (mobile‑friendly)
    -------------------------------------------------------------- */
 document.getElementById('useSelects').addEventListener('change', e => {
   const useSelect = e.target.checked;
   document.querySelectorAll('.selectOnly').forEach(lbl => lbl.style.display = useSelect ? 'block' : 'none');
-  document.querySelectorAll('#runSection input, #pushSection input, #sitSection input, #plankSection input')
-    .forEach(inp => inp.style.display = useSelect ? 'none' : 'block');
+  document.querySelectorAll('.typeOnly').forEach(inp => inp.style.display = useSelect ? 'none' : 'block');
 
-  // If we just switched to selects, make sure they are up‑to‑date
+  // If we just switched to selects, make sure they reflect the current age bucket
   if (useSelect) populateSelects();
 });
 
@@ -303,7 +302,7 @@ document.getElementById('ptForm').addEventListener('submit', e => {
   const sitPts   = lookupNumeric(bucketData.situps, sitVal);
   const plankPts = lookupNumeric(bucketData.plank, plankSec);
   const whtrInfo = lookupWhtr(waist, height);   // {pts, ratio, category}
-  const total = runPts + pushPts + sitPts + plankPts + whtrInfo.pts;
+  const total    = runPts + pushPts + sitPts + plankPts + whtrInfo.pts;
 
   /* ----- Minimum‑component thresholds (taken from JSON) ----- */
   const mins = PT_DATA.minimumComponentValues;
