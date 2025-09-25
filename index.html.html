@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>USAF PT Score Calculator</title>
+  <style>
+    body{font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial;max-width:900px;margin:24px auto;padding:0 16px;color:#0b1220}
+    header{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+    h1{margin:0;font-size:1.25rem}
+    .card{border:1px solid #e6e9ef;padding:16px;border-radius:10px;box-shadow:0 6px 18px rgba(15,23,42,0.04)}
+    label{display:block;margin:10px 0 6px;font-weight:600}
+    input[type="number"], select, .run-time {padding:8px;border-radius:8px;border:1px solid #cfd8e3;width:100%;}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+    button{background:#0f62fe;color:white;padding:10px 14px;border-radius:8px;border:0;font-weight:700;cursor:pointer}
+    .result{margin-top:12px;padding:12px;border-radius:8px}
+    .ok{background:#ecfdf5;border:1px solid #c6f6d5}
+    .warn{background:#fff8e6;border:1px solid #ffe8a1}
+    .bad{background:#fff1f2;border:1px solid #ffcad4}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>USAF PT Score Calculator</h1>
+  </header>
+
+  <section class="card">
+    <label for="gender">Gender</label>
+    <select id="gender">
+      <option value="male">Male</option>
+      <option value="female">Female</option>
+    </select>
+
+    <label for="ageGroup">Age group</label>
+    <select id="ageGroup">
+      <option value="<25">&lt;25</option>
+      <option value="25-29">25–29</option>
+      <option value="30-34">30–34</option>
+      <option value="35-39">35–39</option>
+      <option value="40-44">40–44</option>
+      <option value="45-49">45–49</option>
+      <option value="50-54">50–54</option>
+      <option value="55-59">55–59</option>
+      <option value="over 60">60+</option>
+    </select>
+
+    <div class="grid" style="margin-top:12px">
+      <div>
+        <label for="pushups">Push-ups (reps)</label>
+        <input id="pushups" type="number" min="0" step="1">
+      </div>
+      <div>
+        <label for="situps">Sit-ups (reps)</label>
+        <input id="situps" type="number" min="0" step="1">
+      </div>
+      <div>
+        <label for="run">1.5-mile run time (mm:ss)</label>
+        <input id="run" class="run-time" placeholder="e.g. 11:30">
+      </div>
+    </div>
+
+    <div style="margin-top:12px">
+      <button id="calcBtn">Calculate</button>
+    </div>
+
+    <div id="output"></div>
+  </section>
+
+<script>
+let SCORING_TABLES = null;
+
+// Load JSON file (must be in the same folder as this HTML file)
+fetch('usaf_pt_charts_clean.json')
+  .then(r => r.json())
+  .then(data => {
+    SCORING_TABLES = data;
+    console.log("Scoring data loaded:", SCORING_TABLES);
+  })
+  .catch(err => {
+    console.error("Could not load scoring data:", err);
+  });
+
+function timeToSeconds(t){
+  if(!t) return null;
+  const [mm, ss] = t.split(":").map(n => parseInt(n,10));
+  return mm*60 + ss;
+}
+
+function lookupPoints(mapping, value, isTime=false){
+  if(!mapping) return 0;
+  const keys = Object.keys(mapping).map(k=>parseInt(k,10)).sort((a,b)=>a-b);
+  if(isTime){
+    for(let k of keys){
+      if(value <= k) return mapping[k];
+    }
+    return 0;
+  } else {
+    for(let i=keys.length-1; i>=0; i--){
+      if(value >= keys[i]) return mapping[keys[i]];
+    }
+    return 0;
+  }
+}
+
+function calculateComposite(gender, ageGroup, push, sit, run){
+  if(!SCORING_TABLES) return {error:"Scoring data not loaded."};
+  const cohort = SCORING_TABLES[gender] && SCORING_TABLES[gender][ageGroup];
+  if(!cohort) return {error:"No data for that age group."};
+
+  const runSecs = timeToSeconds(run);
+  const runPts = lookupPoints(cohort.run, runSecs, true);
+  const pushPts = lookupPoints(cohort.pushups, push, false);
+  const sitPts = lookupPoints(cohort.situps, sit, false);
+
+  const total = runPts + pushPts + sitPts; // simplified composite
+  const category = total >= 90 ? "Excellent" :
+                   total >= 75 ? "Satisfactory" : "Unsatisfactory";
+  return {runPts, pushPts, sitPts, total, category};
+}
+
+document.getElementById('calcBtn').addEventListener('click', ()=>{
+  const gender = document.getElementById('gender').value;
+  const age = document.getElementById('ageGroup').value;
+  const push = parseInt(document.getElementById('pushups').value)||0;
+  const sit = parseInt(document.getElementById('situps').value)||0;
+  const run = document.getElementById('run').value.trim();
+
+  const res = calculateComposite(gender, age, push, sit, run);
+  const out = document.getElementById('output');
+
+  if(res.error){
+    out.innerHTML = `<div class="result bad">${res.error}</div>`;
+    return;
+  }
+
+  const css = res.category==="Excellent"?"ok":res.category==="Satisfactory"?"warn":"bad";
+  out.innerHTML = `
+    <div class="result ${css}">
+      Run points: ${res.runPts}<br>
+      Push-ups points: ${res.pushPts}<br>
+      Sit-ups points: ${res.sitPts}<br>
+      <hr>
+      <strong>Total: ${res.total.toFixed(1)} (${res.category})</strong>
+    </div>
+  `;
+});
+</script>
+</body>
+</html>
