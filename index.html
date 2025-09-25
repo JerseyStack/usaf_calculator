@@ -117,7 +117,7 @@ fetch('usaf_pt_charts_clean.json')
   })
   .catch(error => {
     console.error('❌ Failed to load or parse PT data:', error);
-    alert('CRITICAL ERROR: Could not load PT data file `usaf_pt_charts_clean.json`. The calculator cannot function. Check the console for details.');
+    alert('CRITICAL ERROR: Could not load PT data file. The calculator cannot function. Check the console for details.');
   });
 
 // ========================================================================
@@ -136,25 +136,19 @@ const getAgeBucket = age => {
 // SCORE LOOKUP LOGIC
 // ========================================================================
 const lookupNumeric = (table, value) => {
-  if (!table) return 0;
+  if (!table || isNaN(value)) return 0;
   const tiers = Object.keys(table).map(Number).sort((a, b) => b - a);
-  for (const tier of tiers) {
-    if (value >= tier) return table[tier];
-  }
+  for (const tier of tiers) { if (value >= tier) return table[tier]; }
   return 0;
 };
-
 const lookupRunTime = (table, userTimeSec) => {
-  if (!table) return 0;
+  if (!table || isNaN(userTimeSec)) return 0;
   const tiers = Object.keys(table).map(time => [mmssToSec(time), table[time]]).sort((a, b) => a[0] - b[0]);
-  for (const [tierSec, points] of tiers) {
-    if (userTimeSec <= tierSec) return points;
-  }
+  for (const [tierSec, points] of tiers) { if (userTimeSec <= tierSec) return points; }
   return 0;
 };
-
 const lookupWhtr = (waist, height) => {
-    if (height === 0) return { pts: 0, ratio: "N/A", category: "Invalid Height" };
+    if (height === 0 || !PT_DATA.whtr) return { pts: 0, ratio: "N/A", category: "Invalid Height" };
     const ratio = (waist / height).toFixed(2);
     const WHTR_TABLE = PT_DATA.whtr;
     const tiers = Object.keys(WHTR_TABLE).map(Number).sort((a, b) => a - b);
@@ -168,55 +162,54 @@ const lookupWhtr = (waist, height) => {
 };
 
 // ========================================================================
-// DYNAMIC UI UPDATES & INPUT FORMATTING
+// DYNAMIC UI UPDATES & INPUT FORMATTING (RESTORED SECTION)
 // ========================================================================
-
-// NEW FUNCTION: Auto-adds a colon for time inputs
 const handleTimeInput = (event) => {
     const input = event.target;
-    const id = input.id;
-    let isTimeField = false;
-
-    // Determine if the current input should be formatted as time
-    if (id === 'cardio-input' && document.querySelector('input[name="cardio"]:checked').value === 'run') {
-        isTimeField = true;
-    } else if (id === 'core-input' && document.querySelector('input[name="core"]:checked').value === 'plank') {
-        isTimeField = true;
-    }
+    let isTimeField = (input.id === 'cardio-input' && document.querySelector('input[name="cardio"]:checked').value === 'run') ||
+                      (input.id === 'core-input' && document.querySelector('input[name="core"]:checked').value === 'plank');
 
     if (isTimeField) {
-        // Get only the digits from the input
         const digits = input.value.replace(/\D/g, '').substring(0, 4);
         let formattedValue = digits;
         if (digits.length > 2) {
-            // Insert colon after the first two digits
-            formattedValue = `${digits.substring(0, 2)}:${digits.substring(2)}`;const updateInputLabel = (radioName, mappings) => {
+            formattedValue = `${digits.substring(0, 2)}:${digits.substring(2)}`;
+        }
+        input.value = formattedValue;
+    }
+};
+
+const updateInputLabel = (radioName, mappings) => {
     document.querySelectorAll(`input[name="${radioName}"]`).forEach(radio => {
         radio.addEventListener('change', (e) => {
-            const { label, placeholder, inputmode } = mappings[e.target.value];
+            const config = mappings[e.target.value];
             const labelEl = document.getElementById(`${radioName}-label`);
             const inputEl = document.getElementById(`${radioName}-input`);
-            if (labelEl) labelEl.textContent = label;
+            if (labelEl) labelEl.textContent = config.label;
             if (inputEl) {
-                inputEl.placeholder = placeholder;
+                inputEl.placeholder = config.placeholder;
                 inputEl.value = '';
-                inputEl.inputmode = inputmode;
-                // Since the input type might change, we re-apply the correct type attribute
-                inputEl.type = (inputmode === 'numeric' && radioName !== 'core') ? 'number' : 'text';
+                inputEl.inputmode = config.inputmode;
+                inputEl.type = (config.inputmode === 'numeric') ? 'number' : 'text';
             }
         });
     });
 };
 
-updateInputLabel('cardio', {
-    run:  { label: 'Run Time (mm:ss)', placeholder: 'e.g., 14:30', inputmode: 'tel'},
-    hamr: { label: 'HAMR Shuttles', placeholder: 'e.g., 65', inputmode: 'numeric'}
-});
+// Attach event listeners
+document.addEventListener('DOMContentLoaded', () => {
+    updateInputLabel('cardio', {
+        run:  { label: 'Run Time (mm:ss)', placeholder: 'e.g., 14:30', inputmode: 'tel'},
+        hamr: { label: 'HAMR Shuttles', placeholder: 'e.g., 65', inputmode: 'numeric'}
+    });
+    updateInputLabel('core', {
+        situps:  { label: 'Repetitions', placeholder: 'e.g., 50', inputmode: 'numeric' },
+        crunch:  { label: 'Repetitions', placeholder: 'e.g., 40', inputmode: 'numeric' },
+        plank:   { label: 'Plank Time (mm:ss)', placeholder: 'e.g., 2:15', inputmode: 'tel' }
+    });
 
-updateInputLabel('core', {
-    situps:  { label: 'Repetitions', placeholder: 'e.g., 50', inputmode: 'numeric' },
-    crunch:  { label: 'Repetitions', placeholder: 'e.g., 40', inputmode: 'numeric' },
-    plank:   { label: 'Plank Time (mm:ss)', placeholder: 'e.g., 2:15', inputmode: 'tel' }
+    document.getElementById('cardio-input').addEventListener('input', handleTimeInput);
+    document.getElementById('core-input').addEventListener('input', handleTimeInput);
 });
 
 
@@ -249,7 +242,7 @@ document.getElementById('ptForm').addEventListener('submit', (e) => {
     return alert('Please fill out all Age, Waist, and Height fields with valid numbers.');
   }
   const bucket = getAgeBucket(age);
-  const bucketData = PT_DATA[gender][bucket];
+  const bucketData = PT_DATA[gender]?.[bucket];
   if (!bucketData) {
     return alert(`Sorry, scoring data for the ${gender}, age ${age} bracket is not available in the JSON file.`);
   }
@@ -260,7 +253,7 @@ document.getElementById('ptForm').addEventListener('submit', (e) => {
       if (!/^\d{1,2}:\d{2}$/.test(cardioInput)) return alert('Run time must be in mm:ss format.');
       cardioPts = lookupRunTime(bucketData.run, mmssToSec(cardioInput));
   } else {
-      cardioPts = lookupNumeric(bucketData.run, parseInt(cardioInput, 10));
+      cardioPts = lookupNumeric(bucketData.run, parseInt(cardioInput, 10)); // HAMR uses run table points
       cardioDisplay = `${parseInt(cardioInput, 10)} shuttles`;
   }
   
@@ -269,7 +262,7 @@ document.getElementById('ptForm').addEventListener('submit', (e) => {
   let corePts = 0, coreDisplay = coreInput;
   if (coreChoice === 'plank') {
     if (!/^\d{1,2}:\d{2}$/.test(coreInput)) return alert('Plank time must be in mm:ss format.');
-    corePts = lookupRunTime(bucketData.plank, mmssToSec(coreInput)); // Plank is also a time lookup
+    corePts = lookupRunTime(bucketData.plank, mmssToSec(coreInput));
     coreDisplay = coreInput;
   } else {
     corePts = lookupNumeric(bucketData[coreChoice], parseInt(coreInput, 10));
@@ -279,7 +272,7 @@ document.getElementById('ptForm').addEventListener('submit', (e) => {
   const whtrInfo = lookupWhtr(waist, height);
 
   // --- CALCULATE TOTAL & CHECK MINIMUMS ---
-  const totalScore = cardioPts + upperPts + corePts + whtrInfo.pts;
+  const totalScore = (cardioPts || 0) + (upperPts || 0) + (corePts || 0) + (whtrInfo.pts || 0);
   const mins = PT_DATA.minimumComponentValues;
   
   const passedCardio = cardioPts >= mins.run;
@@ -292,7 +285,7 @@ document.getElementById('ptForm').addEventListener('submit', (e) => {
 
   // --- DISPLAY RESULTS ---
   const getResultLine = (label, display, points, passed) =>
-    `<p>${label} (${display}): <strong>${points.toFixed(1)} pts</strong> ${passed ? '✅' : '❌'}</p>`;
+    `<p>${label} (${display}): <strong>${(points || 0).toFixed(1)} pts</strong> ${passed ? '✅' : '❌'}</p>`;
 
   const outputDiv = document.getElementById('output');
   outputDiv.style.display = 'block';
