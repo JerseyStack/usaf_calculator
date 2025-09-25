@@ -2,95 +2,23 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>USAF PT Score Calculator</title>
-
-<!-- 1️⃣  Tell mobile browsers to use the device width -->
+<title>USAF PT Score Calculator – 2‑Mile + WHtR</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-
 <style>
-  /* -----------------------------------------------------------
-     2️⃣  Global layout – a centered, fluid container
-     ----------------------------------------------------------- */
-  body {
-    font-family: Arial, Helvetica, sans-serif;
-    line-height: 1.5;
-    margin: 0;
-    padding: 0 1rem;
-    background:#f2f2f2;
-  }
-
-  .wrapper {
-    max-width: 800px;          /* never wider than desktop layout */
-    margin: 2rem auto;
-    background:#fff;
-    padding:1.5rem;
-    border-radius:8px;
-    box-shadow:0 2px 8px rgba(0,0,0,.15);
-  }
-
-  h1 {
-    text-align:center;
-    margin-bottom:1.5rem;
-    font-size:1.8rem;
-  }
-
-  /* -----------------------------------------------------------
-     3️⃣  Form – flex column, full‑width controls
-     ----------------------------------------------------------- */
-  form {
-    display:flex;
-    flex-direction:column;
-    gap:1rem;
-  }
-
-  label {
-    display:flex;
-    flex-direction:column;
-    font-weight:600;
-  }
-
-  input,
-  select,
-  button {
-    width:100%;                     /* fill the column */
-    padding:.6rem;
-    font-size:1rem;
-    border:1px solid #999;
-    border-radius:4px;
-    box-sizing:border-box;
-  }
-
-  button {
-    margin-top:1rem;
-    background:#0066cc;
-    color:#fff;
-    cursor:pointer;
-    font-weight:600;
-  }
-
+  body {font-family:Arial,Helvetica,sans-serif; margin:0; padding:0 1rem; background:#f2f2f2;}
+  .wrapper {max-width:800px; margin:2rem auto; background:#fff; padding:1.5rem;
+            border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,.15);}
+  h1 {text-align:center; margin-bottom:1rem;}
+  form {display:flex; flex-direction:column; gap:1rem;}
+  label {display:flex; flex-direction:column; font-weight:600;}
+  input, select, button {width:100%; padding:.6rem; font-size:1rem;
+                         border:1px solid #999; border-radius:4px; box-sizing:border-box;}
+  button {background:#0066cc; color:#fff; cursor:pointer; font-weight:600;}
   button:hover {background:#0055aa;}
-
-  /* -----------------------------------------------------------
-     4️⃣  Result box
-     ----------------------------------------------------------- */
-  .result {
-    margin-top:2rem;
-    padding:1rem;
-    border:2px solid #444;
-    background:#fafafa;
-    font-size:1.1rem;
-  }
-
+  .result {margin-top:2rem; padding:1rem; border:2px solid #444; background:#fafafa;}
   .pass {color:#0a0; font-weight:bold;}
   .fail {color:#c00; font-weight:bold;}
-
-  /* -----------------------------------------------------------
-     5️⃣  Media queries – optional fine‑tuning for very small screens
-     ----------------------------------------------------------- */
-  @media (max-width: 380px) {
-    h1 {font-size:1.5rem;}
-    input, select, button {font-size:.95rem;}
-  }
+  @media (max-width:380px){h1{font-size:1.5rem;} input,select,button{font-size:.95rem;}}
 </style>
 </head>
 
@@ -99,32 +27,40 @@
   <h1>USAF PT Score Calculator</h1>
 
   <form id="ptForm">
-    <label>
-      Gender
+    <label>Gender
       <select id="gender" required>
         <option value="male">Male</option>
         <option value="female">Female</option>
       </select>
     </label>
 
-    <label>
-      Age (years)
+    <label>Age (years)
       <input type="number" id="age" min="17" max="80" required placeholder="e.g. 27">
     </label>
 
-    <label>
-      2‑Mile Run Time (mm:ss)
-      <input type="text" id="runTime" placeholder="e.g. 13:45" pattern="\\d{1,2}:\\d{2}" required>
+    <label>2‑Mile Run Time (mm:ss)
+      <input type="text" id="runTime"
+             placeholder="e.g. 13:45"
+             pattern="[0-9]{1,2}:[0-5][0-9]" required>
     </label>
 
-    <label>
-      Sit‑ups (1 min)
+    <label>Sit‑ups (1 min)
       <input type="number" id="situps" min="0" required placeholder="e.g. 45">
     </label>
 
-    <label>
-      Push‑ups (1 min)
+    <label>Push‑ups (1 min)
       <input type="number" id="pushups" min="0" required placeholder="e.g. 30">
+    </label>
+
+    <!-- ===== NEW WHtR SECTION ===== -->
+    <h3>Waist‑to‑Height Ratio (WHtR)</h3>
+
+    <label>Waist (cm)
+      <input type="number" id="waist" min="30" max="200" required placeholder="e.g. 85">
+    </label>
+
+    <label>Height (cm)
+      <input type="number" id="height" min="100" max="250" required placeholder="e.g. 175">
     </label>
 
     <button type="submit">Calculate Score</button>
@@ -134,16 +70,12 @@
 </div>
 
 <script>
-/* -----------------------------------------------------------
-   6️⃣  Helper utilities
-   ----------------------------------------------------------- */
-function mmssToSec(str) {
-  const [m, s] = str.split(':').map(Number);
-  return m * 60 + s;
-}
+/* ------------------------------------------------------------------
+   Helper functions
+   ------------------------------------------------------------------ */
+function mmssToSec(str){ const [m,s]=str.split(':').map(Number); return m*60+s; }
 
-/* Age‑bucket selector – must match the exact keys in the JSON */
-function getAgeBucket(age) {
+function getAgeBucket(age){
   if (age < 25) return "<25";
   if (age <= 29) return "25-29";
   if (age <= 34) return "30-34";
@@ -155,8 +87,7 @@ function getAgeBucket(age) {
   return "60+";
 }
 
-/* Lookup a numeric table (sit‑ups, push‑ups) – nearest lower bucket */
-function lookupNumeric(table, value) {
+function lookupNumeric(table, value){
   const keys = Object.keys(table).map(Number).sort((a,b)=>a-b);
   let pts = 0;
   for (let i = keys.length-1; i >= 0; i--) {
@@ -165,12 +96,10 @@ function lookupNumeric(table, value) {
   return pts;
 }
 
-/* Run‑time lookup – larger time = lower points (fastest = most points) */
-function lookupRun(table, secs) {
+function lookupRun(table, secs){
   const entries = Object.entries(table)
-    .map(([k,v]) => [mmssToSec(k), v])
+    .map(([k,v])=>[mmssToSec(k),v])
     .sort((a,b)=>a[0]-b[0]);               // ascending time
-
   let pts = 0;
   for (let i = entries.length-1; i >= 0; i--) {
     if (secs <= entries[i][0]) { pts = entries[i][1]; break; }
@@ -178,9 +107,33 @@ function lookupRun(table, secs) {
   return pts;
 }
 
-/* -----------------------------------------------------------
-   7️⃣  Load the JSON data
-   ----------------------------------------------------------- */
+/* ------------------------------------------------------------------
+   WHtR lookup – points & risk category (same for all ages/genders)
+   ------------------------------------------------------------------ */
+const WHTR_TABLE = {
+  "0.49": 20, "0.50": 19, "0.51": 18, "0.52": 17, "0.53": 16,
+  "0.54": 15, "0.55": 12.5, "0.56": 10, "0.57": 7.5,
+  "0.58": 5, "0.59": 2.5, "0.60": 0
+};
+
+function lookupWhtr(waist, height){
+  const ratio = (waist/height).toFixed(2);          // string with 2 decimals
+  const keys = Object.keys(WHTR_TABLE).map(Number).sort((a,b)=>a-b);
+  let pts = 0, category = 'High Risk';
+  for (let i = keys.length-1; i >= 0; i--) {
+    if (ratio <= keys[i]) {
+      pts = WHTR_TABLE[keys[i].toFixed(2)];
+      category = (keys[i] <= 0.49) ? 'Low Risk' :
+                 (keys[i] < 0.60) ? 'Moderate Risk' : 'High Risk';
+      break;
+    }
+  }
+  return {pts, ratio, category};
+}
+
+/* ------------------------------------------------------------------
+   Load the JSON data (must be served from a web server)
+   ------------------------------------------------------------------ */
 let PT_DATA = null;
 fetch('usaf_pt_charts_clean.json')
   .then(r => {
@@ -193,22 +146,27 @@ fetch('usaf_pt_charts_clean.json')
     alert('Failed to load PT data – check the console for details.');
   });
 
-/* -----------------------------------------------------------
-   8️⃣  Form submit handler
-   ----------------------------------------------------------- */
+/* ------------------------------------------------------------------
+   Form submit handler (now includes WHtR)
+   ------------------------------------------------------------------ */
 document.getElementById('ptForm').addEventListener('submit', e => {
   e.preventDefault();
   if (!PT_DATA) return alert('Data not loaded yet.');
 
-  const gender  = document.getElementById('gender').value;
-  const age     = Number(document.getElementById('age').value);
-  const runStr  = document.getElementById('runTime').value.trim();
-  const situps  = Number(document.getElementById('situps').value);
-  const pushups = Number(document.getElementById('pushups').value);
+  const gender   = document.getElementById('gender').value;
+  const age      = Number(document.getElementById('age').value);
+  const runStr   = document.getElementById('runTime').value.trim();
+  const situps   = Number(document.getElementById('situps').value);
+  const pushups  = Number(document.getElementById('pushups').value);
+  const waist    = Number(document.getElementById('waist').value);
+  const height   = Number(document.getElementById('height').value);
 
-  // ---- basic validation -------------------------------------------------
-  if (!/^\d{1,2}:\d{2}$/.test(runStr)) {
-    return alert('Run time must be in mm:ss format.');
+  // ---- validation -------------------------------------------------
+  if (!/^[0-9]{1,2}:[0-5][0-9]$/.test(runStr)) {
+    return alert('Run time must be in mm:ss format (seconds 00‑59).');
+  }
+  if (waist <= 0 || height <= 0) {
+    return alert('Please enter valid waist and height numbers.');
   }
 
   const bucket = getAgeBucket(age);
@@ -217,26 +175,33 @@ document.getElementById('ptForm').addEventListener('submit', e => {
     return alert(`No scoring table for ${gender} age ${age} (bucket ${bucket})`);
   }
 
-  // ---- look up points ----------------------------------------------------
+  // ---- look‑ups ----------------------------------------------------
   const runPts   = lookupRun(genderData[bucket].run, mmssToSec(runStr));
   const sitPts   = lookupNumeric(genderData[bucket].situps, situps);
   const pushPts  = lookupNumeric(genderData[bucket].pushups, pushups);
+  const whtrInfo = lookupWhtr(waist, height);   // {pts, ratio, category}
 
-  const total = runPts + sitPts + pushPts;
+  // ---- composite score (run + sit‑ups + push‑ups + WHtR) -------------
+  const total = runPts + sitPts + pushPts + whtrInfo.pts;
 
-  // ---- minimum‑component check (USAF rule: run ≥5, each muscular ≥4) -----
-  const MIN_RUN   = 5;
-  const MIN_MUSC  = 4;
-  const passed = (total >= 75) && (runPts >= MIN_RUN) && (sitPts >= MIN_MUSC) && (pushPts >= MIN_MUSC);
+  // ---- minimum component values (USAF rule) ------------------------
+  const MIN_RUN   = 5;   // run must be ≥ 5 pts
+  const MIN_MUSC  = 4;   // each muscular component (incl. WHtR) ≥ 4 pts
+  const passed = (total >= 75) &&
+                 (runPts   >= MIN_RUN) &&
+                 (sitPts   >= MIN_MUSC) &&
+                 (pushPts  >= MIN_MUSC) &&
+                 (whtrInfo.pts >= MIN_MUSC);
 
-  // ---- display -----------------------------------------------------------
+  // ---- display -----------------------------------------------------
   const out = document.getElementById('output');
   out.style.display = 'block';
   out.innerHTML = `
     <h2>Result (${gender.toUpperCase()}, Age ${age})</h2>
-    <p><strong>Run (2‑mile) :</strong> ${runStr} → <strong>${runPts}</strong> pts</p>
+    <p><strong>Run (2 mi) :</strong> ${runStr} → <strong>${runPts}</strong> pts</p>
     <p><strong>Sit‑ups :</strong> ${situps} → <strong>${sitPts}</strong> pts</p>
     <p><strong>Push‑ups :</strong> ${pushups} → <strong>${pushPts}</strong> pts</p>
+    <p><strong>WHtR :</strong> ${whtrInfo.ratio} (${whtrInfo.category}) → <strong>${whtrInfo.pts}</strong> pts</p>
     <p><strong>Total :</strong> ${total} pts</p>
     <p class="${passed ? 'pass' : 'fail'}">
       ${passed ? 'PASS – you meet the composite & component minimums' : 'FAIL – you did not meet the required thresholds'}
