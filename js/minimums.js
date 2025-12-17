@@ -1,6 +1,5 @@
 const genderEl = document.getElementById("gender");
 const ageEl = document.getElementById("age");
-const cardioEl = document.getElementById("cardio");
 const resultsEl = document.getElementById("results");
 const summaryEl = document.getElementById("summary");
 
@@ -16,7 +15,6 @@ function loadFromURL() {
 
   if (gender) genderEl.value = gender;
   if (age) ageEl.value = age;
-  if (cardio) cardioEl.value = cardio;
 
   summaryEl.innerHTML = `
     <strong>From Calculator:</strong><br>
@@ -28,18 +26,40 @@ function loadFromURL() {
   `;
 }
 
-/* --- MINIMUMS LOGIC (SIMPLE, TRANSPARENT) --- */
+/* --- MINIMUMS LOGIC --- */
 function calculateMinimums() {
-  const targetScore = 75;
-  const cardioScore = 50;
-  const remaining = targetScore - cardioScore;
+  const target = 75;
+  const maxScore = 50;
 
-  const eachComponent = Math.ceil(remaining / 2);
+  const assumption = document.querySelector(
+    'input[name="assumption"]:checked'
+  ).value;
+
+  let cardio = 0, upper = 0, core = 0;
+
+  if (assumption === "cardio") {
+    cardio = maxScore;
+    const remaining = target - cardio;
+    upper = core = Math.ceil(remaining / 2);
+  }
+
+  if (assumption === "upper") {
+    upper = maxScore;
+    const remaining = target - upper;
+    cardio = core = Math.ceil(remaining / 2);
+  }
+
+  if (assumption === "core") {
+    core = maxScore;
+    const remaining = target - core;
+    cardio = upper = Math.ceil(remaining / 2);
+  }
 
   resultsEl.innerHTML = `
-    <strong>Required Component Scores:</strong><br>
-    Upper Body: ${eachComponent} pts<br>
-    Core: ${eachComponent} pts
+    <strong>Required Scores to Reach 75:</strong><br><br>
+    Cardio: ${cardio} pts<br>
+    Upper Body: ${upper} pts<br>
+    Core: ${core} pts
   `;
 }
 
