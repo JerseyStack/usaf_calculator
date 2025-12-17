@@ -2,23 +2,19 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>USAF PT – Passing Profiles</title>
+  <title>USAF PT Calculator</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
 
 <a href="./index.html">← Home</a>
 
-<h1>75-Point Passing Profiles</h1>
-<p>
-  These examples show different ways to reach a passing PT score of 75.
-</p>
+<h1>USAF PT Score Calculator</h1>
 
 <label>
   Gender:
   <select id="gender">
     <option value="male">Male</option>
-    <option value="female">Female</option>
   </select>
 </label>
 
@@ -35,10 +31,113 @@
   </select>
 </label>
 
-<button id="calcBtn">Show Passing Options</button>
+<label>
+  Run Time (mm:ss) OR HAMR shuttles:
+  <input type="text" id="cardio">
+</label>
 
-<div id="results" style="margin-top:1.5rem;"></div>
+<label>
+  Pushups:
+  <input type="number" id="pushups">
+</label>
 
-<script type="module" src="./js/minimums.js"></script>
+<label>
+  Plank (mm:ss):
+  <input type="text" id="plank">
+</label>
+
+<button id="calcBtn">Calculate Score</button>
+
+<div id="output" style="margin-top:1.5rem;"></div>
+
+<script>
+/* =====================================
+   Helpers
+===================================== */
+function ageToBracket(age) {
+  if (age < 25) return "<25";
+  if (age <= 29) return "25-29";
+  if (age <= 34) return "30-34";
+  if (age <= 39) return "35-39";
+  if (age <= 44) return "40-44";
+  if (age <= 49) return "45-49";
+  return null;
+}
+
+function timeToSeconds(t) {
+  const [m, s] = t.split(":").map(Number);
+  return m * 60 + s;
+}
+
+function scoreFromTable(table, value, isTime = false) {
+  let best = 0;
+
+  for (const key in table) {
+    if (
+      (isTime && timeToSeconds(value) <= timeToSeconds(key)) ||
+      (!isTime && Number(value) >= Number(key))
+    ) {
+      best = Math.max(best, table[key]);
+    }
+  }
+  return best;
+}
+
+/* =====================================
+   Calculator Logic
+===================================== */
+document.getElementById("calcBtn").onclick = () => {
+  const output = document.getElementById("output");
+  output.innerHTML = "";
+
+  const gender = document.getElementById("gender").value;
+  const age = Number(document.getElementById("age").value);
+  const cardioType = document.getElementById("cardioType").value;
+  const cardioVal = document.getElementById("cardio").value;
+  const pushups = Number(document.getElementById("pushups").value);
+  const plank = document.getElementById("plank").value;
+
+  if (!age || !cardioVal || !pushups || !plank) {
+    output.textContent = "Please fill out all fields.";
+    return;
+  }
+
+  const bracket = ageToBracket(age);
+  if (!bracket || !PT_DATA[gender] || !PT_DATA[gender][bracket]) {
+    output.textContent = "This age group is not yet supported.";
+    return;
+  }
+
+  const data = PT_DATA[gender][bracket];
+
+  const cardioScore = scoreFromTable(
+    data[cardioType],
+    cardioVal,
+    cardioType === "run"
+  );
+
+  const pushScore = scoreFromTable(data.pushups, pushups);
+  const plankScore = scoreFromTable(data.plank, plank, true);
+
+  const total = cardioScore + pushScore + plankScore;
+  const pass = total >= 75;
+
+  output.innerHTML = `
+    <h3>Total Score: ${total.toFixed(1)}</h3>
+    <strong>Status:</strong>
+    <span style="color:${pass ? "green" : "red"}">
+      ${pass ? "PASS" : "FAIL"}
+    </span>
+    <hr>
+    <ul>
+      <li>Cardio (${cardioType}): ${cardioScore.toFixed(1)}</li>
+      <li>Pushups: ${pushScore.toFixed(1)}</li>
+      <li>Plank: ${plankScore.toFixed(1)}</li>
+    </ul>
+  `;
+};
+
+</script>
+
 </body>
 </html>
