@@ -1,20 +1,6 @@
-import { PT_DATA } from "./pt-data.js";
-
 const PASSING_SCORE = 75;
-const MAX = {
-  cardio: 50,
-  pushups: 15,
-  core: 15
-};
 
-const SAFE_MIN = {
-  pushups: 10,
-  core: 10
-};
-
-// --------------------------------------------------
-// Helpers
-// --------------------------------------------------
+// ---------------- Helpers ----------------
 function ageToBracket(age) {
   if (age < 25) return "<25";
   if (age <= 29) return "25-29";
@@ -22,82 +8,59 @@ function ageToBracket(age) {
   if (age <= 39) return "35-39";
   if (age <= 44) return "40-44";
   if (age <= 49) return "45-49";
-  return "50+";
+  return null;
 }
 
-function findMetricForScore(table, target, isTime = false) {
-  let best = null;
+function findMetric(table, target, isTime = false) {
+  let result = null;
 
-  for (const [metric, score] of Object.entries(table)) {
-    if (score >= target) {
-      if (!best) best = metric;
-
-      if (isTime) {
-        if (metric > best) best = metric; // slower = worse
-      } else {
-        if (+metric < +best) best = metric; // fewer = worse
-      }
+  for (const key in table) {
+    if (table[key] >= target) {
+      if (!result) result = key;
+      if (isTime && key > result) result = key;
+      if (!isTime && +key < +result) result = key;
     }
   }
-  return best;
+  return result ?? "N/A";
 }
 
-// --------------------------------------------------
-// Profile generator
-// --------------------------------------------------
+// ---------------- Profiles ----------------
 function buildProfiles(data, cardioType) {
   return [
     {
       title: "🅰 Strength-Focused",
-      pushups: MAX.pushups,
-      core: SAFE_MIN.core
+      push: 15,
+      core: 10
     },
     {
       title: "🅱 Core-Focused",
-      pushups: SAFE_MIN.pushups,
-      core: MAX.core
+      push: 10,
+      core: 15
     },
     {
       title: "🅲 Cardio-Focused",
-      pushups: SAFE_MIN.pushups,
-      core: SAFE_MIN.core,
-      cardio: MAX.cardio
+      push: 10,
+      core: 10,
+      cardio: 50
     }
-  ].map(profile => {
-    const pushScore = profile.pushups;
-    const coreScore = profile.core;
+  ].map(p => {
     const cardioScore =
-      profile.cardio ?? PASSING_SCORE - (pushScore + coreScore);
+      p.cardio ?? PASSING_SCORE - (p.push + p.core);
 
     return {
-      title: profile.title,
-      pushups:
-        pushScore === MAX.pushups
-          ? "MAX"
-          : findMetricForScore(data.pushups, pushScore),
-      core:
-        coreScore === MAX.core
-          ? "MAX"
-          : findMetricForScore(data.plank, coreScore, true),
+      title: p.title,
+      pushups: p.push === 15 ? "MAX" : findMetric(data.pushups, p.push),
+      plank: p.core === 15 ? "MAX" : findMetric(data.plank, p.core, true),
       cardio:
-        profile.cardio === MAX.cardio
+        p.cardio === 50
           ? "MAX"
-          : findMetricForScore(
-              data[cardioType],
-              cardioScore,
-              cardioType === "run"
-            ),
-      total:
-        pushScore +
-        coreScore +
-        (profile.cardio ?? cardioScore)
+          : findMetric(data[cardioType], cardioScore, cardioType === "run"),
+      total: p.push + p.core + cardioScore
     };
   });
 }
 
-// --------------------------------------------------
-// UI
-// --------------------------------------------------
+// ---------------- UI ----------------
 document.getElementById("calcBtn").onclick = () => {
   const gender = document.getElementById("gender").value;
   const age = +document.getElementById("age").value;
@@ -112,11 +75,14 @@ document.getElementById("calcBtn").onclick = () => {
   }
 
   const bracket = ageToBracket(age);
-  const data = PT_DATA[gender][bracket];
+  const data = PT_DATA?.[gender]?.[bracket];
 
-  const profiles = buildProfiles(data, cardioType);
+  if (!data) {
+    results.textContent = "Age group not supported yet.";
+    return;
+  }
 
-  profiles.forEach(p => {
+  buildProfiles(data, cardioType).forEach(p => {
     const card = document.createElement("div");
     card.style.border = "1px solid #ccc";
     card.style.padding = "1rem";
@@ -127,61 +93,10 @@ document.getElementById("calcBtn").onclick = () => {
       <ul>
         <li>Cardio (${cardioType}): ${p.cardio}</li>
         <li>Pushups: ${p.pushups}</li>
-        <li>Core (Plank): ${p.core}</li>
-        <li><strong>Total: ${p.total.toFixed(1)}</strong></li>
+        <li>Plank: ${p.plank}</li>
+        <li><strong>Total: ${p.total}</strong></li>
       </ul>
     `;
-
     results.appendChild(card);
   });
 };
-
-document.getElementById("calcBtn").onclick = () => {
-  const gender = document.getElementById("gender").value;
-  const age = +document.getElementById("age").value;
-  const cardioType = document.getElementById("cardioType").value;
-  const results = document.getElementById("results");
-
-  results.innerHTML = "";
-
-  if (!age) {
-    results.textContent = "Please enter your age.";
-    return;
-  }
-
-  if (!PT_DATA[gender]) {
-    results.textContent = "Female profiles coming soon.";
-    return;
-  }
-
-  const bracket = ageToBracket(age);
-
-  if (!PT_DATA[gender][bracket]) {
-    results.textContent = "Age bracket not yet supported.";
-    return;
-  }
-
-  const data = PT_DATA[gender][bracket];
-
-  const profiles = buildProfiles(data, cardioType);
-
-  profiles.forEach(p => {
-    const card = document.createElement("div");
-    card.style.border = "1px solid #ccc";
-    card.style.padding = "1rem";
-    card.style.marginBottom = "1rem";
-
-    card.innerHTML = `
-      <h3>${p.title}</h3>
-      <ul>
-        <li>Cardio (${cardioType}): ${p.cardio}</li>
-        <li>Pushups: ${p.pushups}</li>
-        <li>Core (Plank): ${p.core}</li>
-        <li><strong>Total: ${p.total.toFixed(1)}</strong></li>
-      </ul>
-    `;
-
-    results.appendChild(card);
-  });
-};
-
