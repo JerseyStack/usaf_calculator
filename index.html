@@ -1,32 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>milpt.com – USAF PT Tools</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <title>MILPT – USAF PT Tools</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body { font-family: Arial, sans-serif; background:#f2f2f2; }
+    .wrap { max-width:700px; margin:3rem auto; background:#fff; padding:2rem; border-radius:8px; }
+    h1 { text-align:center; }
+    .cards { display:grid; gap:1.5rem; margin-top:2rem; }
+    a.card {
+      display:block; padding:1.5rem; border:2px solid #005A9C;
+      border-radius:8px; text-decoration:none; color:#000;
+    }
+    a.card:hover { background:#f0f6ff; }
+  </style>
 </head>
 <body>
+  <div class="wrap">
+    <h1>MILPT.com</h1>
+    <p style="text-align:center;">USAF PT tools built by Airmen</p>
 
-<h1>milpt.com</h1>
-<p>USAF Physical Training tools built for Airmen.</p>
+    <div class="cards">
+      <a class="card" href="calculator.html">
+        <h2>PT Score Calculator</h2>
+        <p>Enter your test results and calculate your official score.</p>
+      </a>
 
-<div style="margin-top:2rem">
-
-  <a href="./calculator.html">
-    <h2>🧮 PT Score Calculator</h2>
-    <p>Calculate your official USAF PT score.</p>
-  </a>
-
-  <a href="./minimums.html">
-    <h2>🎯 75-Point Passing Profiles</h2>
-    <p>See multiple ways to score a passing 75 based on your strengths.</p>
-  </a>
-
-</div>
-
-<footer style="margin-top:3rem;font-size:0.9em">
-  <p>Not affiliated with the U.S. Air Force. For training use only.</p>
-</footer>
-
+      <a class="card" href="minimums.html">
+        <h2>Minimums to Pass (75)</h2>
+        <p>Enter your age and gender to see the minimums needed to pass.</p>
+      </a>
+    </div>
+  </div>
 </body>
 </html>
