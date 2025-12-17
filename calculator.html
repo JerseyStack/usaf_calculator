@@ -11,48 +11,12 @@
 
 <h1>USAF PT Score Calculator</h1>
 
-<label>
-  Gender:
-  <select id="gender">
-    <option value="male">Male</option>
-    <option value="female">Female</option>
-  </select>
-</label>
-
-<label>
-  Age:
-  <input type="number" id="age" min="17" max="60">
-</label>
-
-<hr>
-
-<h3>Cardio</h3>
-<label><input type="radio" name="cardio" value="run"> 1.5 Mile Run</label>
-<label><input type="radio" name="cardio" value="hamr"> HAMR</label>
-<input id="cardio-input" placeholder="e.g. 15:30 or 75">
-
-<h3>Upper Body</h3>
-<label><input type="radio" name="upper" value="pushups"> Push-ups</label>
-<label><input type="radio" name="upper" value="handRelease"> Hand-Release Push-ups</label>
-<input id="upper-input" placeholder="reps">
-
-<h3>Core</h3>
-<label><input type="radio" name="core" value="plank"> Plank</label>
-<label><input type="radio" name="core" value="situps"> Sit-ups</label>
-<input id="core-input" placeholder="e.g. 2:00 or reps">
-
-<hr>
-
-<h3>Body Composition</h3>
-<label>Waist (in): <input id="waist" type="number"></label>
-<label>Height (in): <input id="height" type="number"></label>
-
-<hr>
+<!-- inputs go here -->
 
 <button id="calcBtn">Calculate</button>
+<div id="output"></div>
 
-<div id="output" style="margin-top:1rem;"></div>
-
+<!-- ONLY this script tag -->
 <script type="module" src="./js/calculator.js"></script>
 </body>
 </html>
