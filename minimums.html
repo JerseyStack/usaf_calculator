@@ -94,29 +94,42 @@
 
   <div id="summary" class="summary"></div>
 
-  <form id="ptForm">
-    <label>Gender
-      <select id="gender">
-        <option value="male">Male</option>
-        <option value="female">Female</option>
-      </select>
-    </label>
+<form id="ptForm">
 
-    <label>Age
-      <input type="number" id="age" min="17" max="80">
-    </label>
+  <label>Gender
+    <select id="gender">
+      <option value="male">Male</option>
+      <option value="female">Female</option>
+    </select>
+  </label>
 
-    <label>Cardio
-      <select id="cardio">
-        <option value="run">2-Mile Run</option>
-        <option value="hamr">HAMR</option>
-      </select>
-    </label>
+  <label>Age
+    <input type="number" id="age" min="17" max="80">
+  </label>
 
-    <button type="submit" class="calc-btn">
-      Calculate Minimums
-    </button>
-  </form>
+  <label>Assumption
+    <div style="margin-top:.5rem">
+      <label>
+        <input type="radio" name="assumption" value="cardio" checked>
+        Max Cardio
+      </label><br>
+
+      <label>
+        <input type="radio" name="assumption" value="upper">
+        Max Upper Body
+      </label><br>
+
+      <label>
+        <input type="radio" name="assumption" value="core">
+        Max Core
+      </label>
+    </div>
+  </label>
+
+  <button type="submit" class="calc-btn">
+    Calculate Minimums
+  </button>
+</form>
 
   <div id="results" class="results"></div>
 
