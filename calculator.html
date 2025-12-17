@@ -10,8 +10,35 @@
 <a href="./index.html">← Home</a>
 
 <h1>USAF PT Score Calculator</h1>
+<label>Gender:
+  <select id="gender">
+    <option value="male">Male</option>
+  </select>
+</label>
 
-<!-- inputs go here -->
+<label>Age:
+  <input type="number" id="age" min="17" max="60">
+</label>
+
+<label>Cardio Type:
+  <select id="cardioType">
+    <option value="run">1.5 Mile Run</option>
+    <option value="hamr">HAMR</option>
+  </select>
+</label>
+
+<label>Run Time (mm:ss) OR HAMR Shuttles:
+  <input type="text" id="cardio">
+</label>
+
+<label>Pushups:
+  <input type="number" id="pushups">
+</label>
+
+<label>Plank (mm:ss):
+  <input type="text" id="plank">
+</label>
+
 
 <button id="calcBtn">Calculate</button>
 <div id="output"></div>
@@ -20,3 +47,4 @@
 <script type="module" src="./js/calculator.js"></script>
 </body>
 </html>
+
