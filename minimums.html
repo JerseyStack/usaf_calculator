@@ -1,32 +1,143 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  …
+<meta charset="UTF-8">
+<title>USAF PT Minimums</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+  body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f2f2f2;
+    margin: 0;
+    padding: 1rem;
+  }
+
+  .card {
+    max-width: 520px;
+    background: #fff;
+    margin: auto;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.08);
+  }
+
+  h1 {
+    text-align: center;
+    margin-bottom: .4rem;
+  }
+
+  .note {
+    text-align: center;
+    font-size: .9rem;
+    color: #444;
+    margin-bottom: 1rem;
+  }
+
+  .summary {
+    background: #eef5fb;
+    padding: .75rem;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+    font-size: .9rem;
+  }
+
+  label {
+    display: block;
+    margin-top: .75rem;
+  }
+
+  select, input {
+    width: 100%;
+    padding: .5rem;
+    margin-top: .25rem;
+  }
+
+  .radio-group {
+    margin-top: .5rem;
+  }
+
+  .calc-btn {
+    display: block;
+    width: 100%;
+    margin-top: 1rem;
+    padding: .8rem;
+    font-size: 1rem;
+    font-weight: bold;
+    background: #005A9C;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+  }
+
+  .calc-btn:hover {
+    background: #004b82;
+  }
+
+  .results {
+    margin-top: 1.25rem;
+    font-size: .95rem;
+  }
+</style>
 </head>
 
 <body>
-  <div class="card">
-    <h1>PT Minimums</h1>
 
-    <p class="note">
-      Minimum component scores required to reach <strong>75 points</strong>,
-      assuming maximum cardio, upper‑body or core.
-    </p>
+<div class="card">
+  <h1>PT Minimums</h1>
 
-    <div id="summary" class="summary"></div>
+  <p class="note">
+    Minimum component scores required to reach <strong>75 points</strong>.
+    Choose which component you expect to max.
+  </p>
 
-    <!-- NOTE: the form now has an explicit ID for the script -->
-    <form id="ptForm">
-      …
-    </form>
+  <div id="summary" class="summary"></div>
 
-    <div id="results" class="results"></div>
+  <form id="ptForm">
 
-    <a href="calculator.html" class="calc-btn">← Back to Calculator</a>
-  </div>
+    <label>Gender
+      <select id="gender">
+        <option value="male">Male</option>
+        <option value="female">Female</option>
+      </select>
+    </label>
 
-  <!-- 1️⃣ Load the data first, then the calculator logic -->
-  <script src="pt-data.js"></script>
-  <script src="minimums.js" type="module"></script>
+    <label>Age
+      <input type="number" id="age" min="17" max="80">
+    </label>
+
+    <label>Assumption
+      <div class="radio-group">
+        <label>
+          <input type="radio" name="assumption" value="cardio" checked>
+          Max Cardio
+        </label><br>
+        <label>
+          <input type="radio" name="assumption" value="upper">
+          Max Upper Body
+        </label><br>
+        <label>
+          <input type="radio" name="assumption" value="core">
+          Max Core
+        </label>
+      </div>
+    </label>
+
+    <button type="submit" class="calc-btn">
+      Calculate Minimums
+    </button>
+  </form>
+
+  <div id="results" class="results"></div>
+
+  <a href="calculator.html" class="calc-btn">
+    ← Back to Calculator
+  </a>
+</div>
+
+<script src="minimums.js"></script>
 </body>
 </html>
