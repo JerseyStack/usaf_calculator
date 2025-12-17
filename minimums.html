@@ -1,141 +1,92 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>USAF PT Minimums</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+// === Conversion Tables ===
+// Cardio: points → 1.5-mile run time (min:sec)
+const cardioTable = {
+  50: "9:12", 45: "10:00", 40: "11:00", 35: "12:30",
+  30: "14:00", 25: "15:30", 20: "16:30", 15: "17:30", 10: "18:30"
+};
 
-<style>
-  body {
-    font-family: Arial, Helvetica, sans-serif;
-    background: #f2f2f2;
-    margin: 0;
-    padding: 1rem;
+// Upper Body: points → push-ups
+const upperTable = {
+  15: 67, 14: 60, 13: 55, 12: 49,
+  11: 45, 10: 40, 9: 35, 8: 30, 7: 25, 6: 20, 5: 15, 4: 10
+};
+
+// Core: points → sit-ups
+const coreTable = {
+  15: 58, 14: 54, 13: 50, 12: 45,
+  11: 42, 10: 38, 9: 34, 8: 30, 7: 25, 6: 20, 5: 15, 4: 10
+};
+
+// Converts points to reps or times based on table
+function convert(points, table) {
+  const keys = Object.keys(table)
+    .map(Number)
+    .sort((a, b) => b - a);
+
+  for (let k of keys) {
+    if (points >= k) return table[k];
+  }
+  return "N/A";
+}
+
+// DOM elements
+const formEl = document.getElementById("ptForm");
+const ageEl = document.getElementById("age");
+const resultsEl = document.getElementById("results");
+
+formEl.addEventListener("submit", function(e) {
+  e.preventDefault();
+  calculateMinimums();
+});
+
+function calculateMinimums() {
+  const age = Number(ageEl.value);
+  if (!age) {
+    resultsEl.innerHTML = "<em>Please enter your age.</em>";
+    return;
   }
 
-  .card {
-    max-width: 520px;
-    background: #fff;
-    margin: auto;
-    padding: 1.5rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,.08);
+  // Max points per component
+  const maxCardio = 50;
+  const maxUpper = 15;
+  const maxCore = 15;
+
+  const targetScore = 75;
+  const assumption = document.querySelector(
+    'input[name="assumption"]:checked'
+  ).value;
+
+  let cardioPts = 0, upperPts = 0, corePts = 0;
+
+  if (assumption === "cardio") {
+    cardioPts = maxCardio;
+    const remaining = targetScore - cardioPts;
+    upperPts = corePts = Math.ceil(remaining / 2);
   }
 
-  h1 {
-    text-align: center;
-    margin-bottom: .4rem;
+  if (assumption === "upper") {
+    upperPts = maxUpper;
+    const remaining = targetScore - upperPts;
+    cardioPts = Math.ceil(remaining / 2);
+    corePts = Math.ceil(remaining / 2);
   }
 
-  .note {
-    text-align: center;
-    font-size: .9rem;
-    color: #444;
-    margin-bottom: 1rem;
+  if (assumption === "core") {
+    corePts = maxCore;
+    const remaining = targetScore - corePts;
+    cardioPts = Math.ceil(remaining / 2);
+    upperPts = Math.ceil(remaining / 2);
   }
 
-  .summary {
-    background: #eef5fb;
-    padding: .75rem;
-    border-radius: 6px;
-    margin-bottom: 1rem;
-    font-size: .9rem;
-  }
+  const cardioReq = convert(cardioPts, cardioTable);
+  const upperReq = convert(upperPts, upperTable);
+  const coreReq = convert(corePts, coreTable);
 
-  label {
-    display: block;
-    margin-top: .75rem;
-  }
-
-  select, input {
-    width: 100%;
-    padding: .5rem;
-    margin-top: .25rem;
-  }
-
-  .radio-group {
-    margin-top: .5rem;
-  }
-
-  .calc-btn {
-    display: block;
-    width: 100%;
-    margin-top: 1rem;
-    padding: .8rem;
-    font-size: 1rem;
-    font-weight: bold;
-    background: #005A9C;
-    color: #fff;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    text-align: center;
-    text-decoration: none;
-  }
-
-  .calc-btn:hover {
-    background: #004b82;
-  }
-
-  .results {
-    margin-top: 1.25rem;
-    font-size: .95rem;
-  }
-</style>
-</head>
-
-<body>
-
-<div class="card">
-  <h1>PT Minimums</h1>
-
-  <p class="note">
-    Minimum component scores required to reach <strong>75 points</strong>.
-    Choose which component you expect to max.
-  </p>
-
-  <div id="summary" class="summary"></div>
-
-  <form id="ptForm">
-
-    <label>Gender
-      <select id="gender">
-        <option value="male">Male</option>
-        <option value="female">Female</option>
-      </select>
-    </label>
-
-    <label>Age
-      <input type="number" id="age" min="17" max="80">
-    </label>
-
-    <label>Assumption
-      <div class="radio-group">
-        <label>
-          <input type="radio" name="assumption" value="cardio" checked>
-          Max Cardio
-        </label><br>
-        <label>
-          <input type="radio" name="assumption" value="upper">
-          Max Upper Body
-        </label><br>
-        <label>
-          <input type="radio" name="assumption" value="core">
-          Max Core
-        </label>
-      </div>
-    </label>
-
-    <button type="submit" class="calc-btn">Calculate Minimums</button>
-  </form>
-
-  <div id="results" class="results"></div>
-
-  <a href="index.html" class="calc-btn">
-    ← Back to Home Page
-  </a>
-</div>
-
-<script src="minimums.js"></script>
-</body>
-</html>
+  resultsEl.innerHTML = `
+    <strong>Minimum Performance to Reach 75:</strong><br><br>
+    Cardio (${cardioPts} pts): <strong>${cardioReq}</strong><br>
+    Upper Body (${upperPts} pts): <strong>${upperReq} reps</strong><br>
+    Core (${corePts} pts): <strong>${coreReq} reps</strong><br><br>
+    <em>Approximate standards for planning only.</em>
+  `;
+}
