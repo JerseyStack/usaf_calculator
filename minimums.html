@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>USAF PT – Passing Profiles</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+
+<a href="./index.html">← Home</a>
+
+<h1>75-Point Passing Profiles</h1>
+<p>
+  These examples show different ways to reach a passing PT score of 75.
+</p>
+
+<label>
+  Gender:
+  <select id="gender">
+    <option value="male">Male</option>
+    <option value="female">Female</option>
+  </select>
+</label>
+
+<label>
+  Age:
+  <input type="number" id="age" min="17" max="60">
+</label>
+
+<label>
+  Cardio:
+  <select id="cardioType">
+    <option value="run">1.5 Mile Run</option>
+    <option value="hamr">HAMR</option>
+  </select>
+</label>
+
+<button id="calcBtn">Show Passing Options</button>
+
+<div id="results" style="margin-top:1.5rem;"></div>
+
+<script type="module" src="./js/minimums.js"></script>
+</body>
+</html>
