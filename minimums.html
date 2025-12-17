@@ -69,6 +69,7 @@
     border: none;
     border-radius: 6px;
     cursor: pointer;
+    text-align: center;
   }
 
   .calc-btn:hover {
@@ -88,16 +89,13 @@
   <h1>PT Minimums</h1>
 
   <p class="note">
-    Minimum performance required to reach <strong>75 points</strong>.
+    Minimum component scores required to reach <strong>75 points</strong>.
     Choose which component you expect to max.
   </p>
 
-  <div id="summary" class="summary">
-    Enter your age and select an assumption.
-  </div>
+  <div id="summary" class="summary"></div>
 
   <form id="ptForm">
-
     <label>Gender
       <select id="gender">
         <option value="male">Male</option>
@@ -114,11 +112,11 @@
         <label>
           <input type="radio" name="assumption" value="cardio" checked>
           Max Cardio
-        </label>
+        </label><br>
         <label>
           <input type="radio" name="assumption" value="upper">
           Max Upper Body
-        </label>
+        </label><br>
         <label>
           <input type="radio" name="assumption" value="core">
           Max Core
@@ -132,86 +130,69 @@
   </form>
 
   <div id="results" class="results"></div>
+
+  <a href="calculator.html" class="calc-btn">
+    ← Back to Calculator
+  </a>
 </div>
 
 <script>
-/* ===== POINTS → PERFORMANCE TABLES (APPROXIMATE) ===== */
-
-const cardioTable = {
-  50: "9:12", 45: "10:00", 40: "11:00", 35: "12:30",
-  30: "14:00", 25: "15:30", 20: "16:30", 15: "17:30", 10: "18:30"
-};
-
-const upperTable = {
-  50: 67, 45: 60, 40: 55, 35: 49,
-  30: 45, 25: 40, 20: 35, 15: 30, 10: 25
-};
-
-const coreTable = {
-  50: 58, 45: 54, 40: 50, 35: 45,
-  30: 42, 25: 38, 20: 34, 15: 30, 10: 25
-};
-
-/* ===== HELPERS ===== */
+// --- PT Tables ---
+const cardioTable = {50:"9:12",45:"10:00",40:"11:00",35:"12:30",30:"14:00",25:"15:30",20:"16:30",15:"17:30",10:"18:30"};
+const upperTable  = {50:67,45:60,40:55,35:49,30:45,25:40,20:35,15:30,10:25};
+const coreTable   = {50:58,45:54,40:50,35:45,30:42,25:38,20:34,15:30,10:25};
 
 function convert(points, table) {
-  const keys = Object.keys(table).map(Number).sort((a, b) => b - a);
-  for (let k of keys) {
-    if (points >= k) return table[k];
-  }
+  const keys = Object.keys(table).map(Number).sort((a,b)=>b-a);
+  for (let k of keys) if (points >= k) return table[k];
   return "N/A";
 }
 
-/* ===== MAIN CALCULATOR ===== */
-
 function calculateMinimums() {
-  const age = Number(document.getElementById("age").value);
+  const ageEl = document.getElementById("age");
   const resultsEl = document.getElementById("results");
+  const age = Number(ageEl.value);
 
   if (!age) {
-    resultsEl.innerHTML =
-      "<em>Please enter your age.</em>";
+    resultsEl.innerHTML = "<em>Please enter your age.</em>";
     return;
   }
 
   const targetScore = 75;
   const maxComponent = 50;
 
-  const assumption = document.querySelector(
-    'input[name="assumption"]:checked'
-  ).value;
+  const assumption = document.querySelector('input[name="assumption"]:checked').value;
 
-  let cardioPts = 0, upperPts = 0, corePts = 0;
+  let cardioPts=0, upperPts=0, corePts=0;
 
-  if (assumption === "cardio") {
-    cardioPts = maxComponent;
-    const remaining = targetScore - cardioPts;
-    upperPts = corePts = Math.ceil(remaining / 2);
+  if (assumption==="cardio") {
+    cardioPts=maxComponent;
+    const remaining = targetScore-cardioPts;
+    upperPts=corePts=Math.ceil(remaining/2);
+  } else if (assumption==="upper") {
+    upperPts=maxComponent;
+    const remaining = targetScore-upperPts;
+    cardioPts=corePts=Math.ceil(remaining/2);
+  } else if (assumption==="core") {
+    corePts=maxComponent;
+    const remaining = targetScore-corePts;
+    cardioPts=upperPts=Math.ceil(remaining/2);
   }
 
-  if (assumption === "upper") {
-    upperPts = maxComponent;
-    const remaining = targetScore - upperPts;
-    cardioPts = corePts = Math.ceil(remaining / 2);
-  }
-
-  if (assumption === "core") {
-    corePts = maxComponent;
-    const remaining = targetScore - corePts;
-    cardioPts = upperPts = Math.ceil(remaining / 2);
-  }
+  const cardioReq = convert(cardioPts, cardioTable);
+  const upperReq = convert(upperPts, upperTable);
+  const coreReq = convert(corePts, coreTable);
 
   resultsEl.innerHTML = `
     <strong>Minimum Performance to Reach 75:</strong><br><br>
-    Cardio (${cardioPts} pts): <strong>${convert(cardioPts, cardioTable)}</strong><br>
-    Upper Body (${upperPts} pts): <strong>${convert(upperPts, upperTable)} reps</strong><br>
-    Core (${corePts} pts): <strong>${convert(corePts, coreTable)} reps</strong><br><br>
-    <em>Approximate values for planning purposes.</em>
+    Cardio (${cardioPts} pts): <strong>${cardioReq}</strong><br>
+    Upper Body (${upperPts} pts): <strong>${upperReq} reps</strong><br>
+    Core (${corePts} pts): <strong>${coreReq} reps</strong><br><br>
+    <em>Approximate standards for planning only.</em>
   `;
 }
 
-/* ===== FORM HOOK ===== */
-
+// --- Hook form submit ---
 document.getElementById("ptForm").addEventListener("submit", e => {
   e.preventDefault();
   calculateMinimums();
