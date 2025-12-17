@@ -1,107 +1,90 @@
-/**
- * PT Minimum Calculator – pure client side.
- * -------------------------------------------------
- * 1️⃣ Reads the static JSON table located at /data/pt_minimums.json
- * 2️⃣ Looks up the proper age‑band row for the supplied gender/age
- * 3️⃣ Calculates the total PT score (same logic as the original repo)
- * 4️⃣ Compares to the "minimum" field and displays PASS/FAIL.
- */
+const genderEl = document.getElementById("gender");
+const ageEl = document.getElementById("age");
+const resultsEl = document.getElementById("results");
+const summaryEl = document.getElementById("summary");
 
-document.addEventListener('DOMContentLoaded', () => {
-  const form = document.getElementById('pt-form');
-  const resultDiv = document.getElementById('result');
+/* --- LOAD CONTEXT FROM CALCULATOR (URL PARAMS) --- */
+function loadFromURL() {
+  const params = new URLSearchParams(window.location.search);
 
-  // -------------------------------------------------
-  // Helper: turn "mm:ss" into total seconds
-  // -------------------------------------------------
-  const parseRun = timeStr => {
-    const [m, s] = timeStr.split(':').map(Number);
-    return (m || 0) * 60 + (s || 0);
-  };
+  const gender = params.get("gender");
+  const age = params.get("age");
+  const cardio = params.get("cardio");
+  const upper = params.get("upper");
+  const core = params.get("core");
 
-  // -------------------------------------------------
-  // Load the static minimum‑table JSON once, then cache it.
-  // -------------------------------------------------
-  let ptTable = null;
-  fetch('data/pt_minimums.json')
-    .then(r => r.ok ? r.json() : Promise.reject('Table not found'))
-    .then(json => { ptTable = json; })
-    .catch(err => {
-      resultDiv.innerHTML = `<p style="color:red;">Error loading data: ${err}</p>`;
-    });
+  if (gender) genderEl.value = gender;
+  if (age) ageEl.value = age;
 
-  // -------------------------------------------------
-  // Main submit handler
-  // -------------------------------------------------
-  form.addEventListener('submit', e => {
-    e.preventDefault();                 // stop page reload
-    if (!ptTable) return;               // data not loaded yet
+  if (gender || age || cardio || upper || core) {
+    summaryEl.innerHTML = `
+      <strong>From Calculator:</strong><br>
+      Gender: ${gender || "—"}<br>
+      Age: ${age || "—"}<br>
+      Cardio: ${cardio || "—"}<br>
+      Upper: ${upper || "—"}<br>
+      Core: ${core || "—"}
+    `;
+  } else {
+    summaryEl.innerHTML = `
+      <em>
+        Opened directly.<br>
+        Enter age manually or return to the calculator.
+      </em>
+    `;
+  }
+}
 
-    // ---- read user input -------------------------------------------------
-    const gender   = document.getElementById('gender').value.toUpperCase();
-    const age      = parseInt(document.getElementById('age').value, 10);
-    const pushups  = parseInt(document.getElementById('pushups').value, 10);
-    const situps   = parseInt(document.getElementById('situps').value, 10);
-    const runTime  = parseRun(document.getElementById('run_time').value);
+/* --- CALCULATE MINIMUMS --- */
+function calculateMinimums() {
+  const age = Number(ageEl.value);
 
-    // ---- locate the proper age‑band row -----------------------------------
-    const row = ptTable.find(r =>
-        r.gender === gender && age >= r.age_min && age <= r.age_max
-    );
+  if (!age) {
+    resultsEl.innerHTML =
+      "<em>Please enter your age or return to the calculator.</em>";
+    return;
+  }
 
-    if (!row) {
-      resultDiv.innerHTML = `<p style="color:red;">No PT table entry for age ${age}</p>`;
-      return;
-    }
+  const targetScore = 75;
+  const maxComponent = 50;
 
-    // ---- functions to convert raw numbers → points (same as original lib) ----
-    const pointsFromReps = (tableArr, reps) => {
-      // tableArr is an array of objects: [{reps: 0, pts: 0}, …]
-      // Find the two surrounding rows and linearly interpolate.
-      for (let i = 0; i < tableArr.length - 1; i++) {
-        const a = tableArr[i];
-        const b = tableArr[i + 1];
-        if (reps >= a.reps && reps <= b.reps) {
-          const ratio = (reps - a.reps) / (b.reps - a.reps);
-          return a.pts + ratio * (b.pts - a.pts);
-        }
-      }
-      // Below the lowest entry → give the lowest point value
-      return tableArr[0].pts;
-    };
+  const assumption = document.querySelector(
+    'input[name="assumption"]:checked'
+  ).value;
 
-    const pointsFromRun = (tableArr, secs) => {
-      // Same linear interpolation, but table is sorted from fastest → slowest
-      for (let i = 0; i < tableArr.length - 1; i++) {
-        const a = tableArr[i];
-        const b = tableArr[i + 1];
-        if (secs >= a.time && secs <= b.time) {
-          const ratio = (secs - a.time) / (b.time - a.time);
-          return a.pts + ratio * (b.pts - a.pts);
-        }
-      }
-      return tableArr[tableArr.length - 1].pts; // worst case
-    };
+  let cardio = 0, upper = 0, core = 0;
 
-    // ---- compute component points -----------------------------------------
-    const puPts = pointsFromReps(row.pushup, pushups);
-    const suPts = pointsFromReps(row.situp, situps);
-    const runPts = pointsFromRun(row.run, runTime);
+  if (assumption === "cardio") {
+    cardio = maxComponent;
+    const remaining = targetScore - cardio;
+    upper = core = Math.ceil(remaining / 2);
+  }
 
-    const total = puPts + suPts + runPts;
-    const passes = total >= row.minimum;
+  if (assumption === "upper") {
+    upper = maxComponent;
+    const remaining = targetScore - upper;
+    cardio = core = Math.ceil(remaining / 2);
+  }
 
-    // ---- render the result -------------------------------------------------
-    const status   = passes ? 'PASS' : 'FAIL';
-    const colour   = passes ? 'green' : 'red';
-    const html = `
-      <div style="border:1px solid ${colour}; padding:10px; margin-top:10px;">
-        <strong style="color:${colour}">Result: ${status}</strong><br>
-        Total Score: ${total.toFixed(1)}<br>
-        Minimum Required: ${row.minimum}<br>
-        Grade: ${total >= row.excellent ? 'Excellent' : (passes ? 'Pass' : 'Fail')}<br>
-        (Push‑ups ${puPts.toFixed(1)} pts, Sit‑ups ${suPts.toFixed(1)} pts, Run ${runPts.toFixed(1)} pts)
-      </div>`;
-    resultDiv.innerHTML = html;
-  });
+  if (assumption === "core") {
+    core = maxComponent;
+    const remaining = targetScore - core;
+    cardio = upper = Math.ceil(remaining / 2);
+  }
+
+  resultsEl.innerHTML = `
+    <strong>Required Scores to Reach 75:</strong><br><br>
+    Cardio: ${cardio} pts<br>
+    Upper Body: ${upper} pts<br>
+    Core: ${core} pts
+  `;
+}
+
+/* --- FORM HANDLER --- */
+document.getElementById("ptForm").addEventListener("submit", e => {
+  e.preventDefault();
+  calculateMinimums();
 });
+
+/* --- INIT --- */
+loadFromURL();
