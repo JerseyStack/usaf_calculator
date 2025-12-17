@@ -135,3 +135,53 @@ document.getElementById("calcBtn").onclick = () => {
     results.appendChild(card);
   });
 };
+
+document.getElementById("calcBtn").onclick = () => {
+  const gender = document.getElementById("gender").value;
+  const age = +document.getElementById("age").value;
+  const cardioType = document.getElementById("cardioType").value;
+  const results = document.getElementById("results");
+
+  results.innerHTML = "";
+
+  if (!age) {
+    results.textContent = "Please enter your age.";
+    return;
+  }
+
+  if (!PT_DATA[gender]) {
+    results.textContent = "Female profiles coming soon.";
+    return;
+  }
+
+  const bracket = ageToBracket(age);
+
+  if (!PT_DATA[gender][bracket]) {
+    results.textContent = "Age bracket not yet supported.";
+    return;
+  }
+
+  const data = PT_DATA[gender][bracket];
+
+  const profiles = buildProfiles(data, cardioType);
+
+  profiles.forEach(p => {
+    const card = document.createElement("div");
+    card.style.border = "1px solid #ccc";
+    card.style.padding = "1rem";
+    card.style.marginBottom = "1rem";
+
+    card.innerHTML = `
+      <h3>${p.title}</h3>
+      <ul>
+        <li>Cardio (${cardioType}): ${p.cardio}</li>
+        <li>Pushups: ${p.pushups}</li>
+        <li>Core (Plank): ${p.core}</li>
+        <li><strong>Total: ${p.total.toFixed(1)}</strong></li>
+      </ul>
+    `;
+
+    results.appendChild(card);
+  });
+};
+
