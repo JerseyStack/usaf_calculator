@@ -5,138 +5,126 @@
 <title>USAF PT Minimums</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
+<link rel="stylesheet" href="styles.css">
+
 <style>
-body {
-  font-family: Arial, Helvetica, sans-serif;
-  margin: 0;
-  padding: 0 1rem;
-  background: #f2f2f2;
-}
+  body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f2f2f2;
+    margin: 0;
+    padding: 1rem;
+  }
 
-.wrapper {
-  max-width: 900px;
-  margin: 2rem auto;
-  background: #fff;
-  padding: 1.5rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,.15);
-}
+  .card {
+    max-width: 520px;
+    background: #fff;
+    margin: auto;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.08);
+  }
 
-h1 {
-  text-align: center;
-  margin-bottom: 1rem;
-}
+  h1 {
+    text-align: center;
+    margin-bottom: .5rem;
+  }
 
-.controls {
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
+  .note {
+    text-align: center;
+    font-size: .9rem;
+    color: #444;
+    margin-bottom: 1rem;
+  }
 
-label {
-  font-weight: 600;
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-}
+  .summary {
+    background: #eef5fb;
+    padding: .75rem;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+    font-size: .9rem;
+  }
 
-select, input {
-  padding: .6rem;
-  font-size: 1rem;
-  border: 1px solid #999;
-  border-radius: 4px;
-}
+  label {
+    display: block;
+    margin-top: .75rem;
+  }
 
-.calc-btn {
-  display: block;
-  width: 100%;
-  margin-top: 1.5rem;
-  padding: .9rem;
-  font-size: 1.05rem;
-  font-weight: 700;
-  background: #005A9C;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-}
+  select, input {
+    width: 100%;
+    padding: .5rem;
+    margin-top: .25rem;
+  }
 
-.calc-btn:hover {
-  background: #004b82;
-}
+  .calc-btn {
+    display: block;
+    width: 100%;
+    margin-top: 1rem;
+    padding: .8rem;
+    font-size: 1rem;
+    font-weight: bold;
+    background: #005A9C;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+  }
 
-.cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1rem;
-  margin-top: 2rem;
-}
+  .calc-btn:hover {
+    background: #004b82;
+  }
 
-.card {
-  border: 2px solid #005A9C;
-  border-radius: 6px;
-  padding: 1rem;
-  background: #fafafa;
-}
-
-.card h2 {
-  margin-top: 0;
-  color: #005A9C;
-  font-size: 1.1rem;
-}
-
-.value {
-  font-weight: bold;
-  font-size: 1.05rem;
-}
-
-.note {
-  font-size: .9rem;
-  color: #555;
-  margin-top: .5rem;
-}
+  .results {
+    margin-top: 1.25rem;
+    font-size: .95rem;
+  }
 </style>
 </head>
 
 <body>
-<div class="wrapper">
-  <h1>USAF PT Minimums (75 Points)</h1>
+
+<div class="card">
+  <h1>PT Minimums</h1>
+
+  <p class="note">
+    Minimum component scores required to reach <strong>75 points</strong>,
+    assuming maximum cardio.
+  </p>
+
+  <div id="summary" class="summary"></div>
 
   <form id="ptForm">
-    <div class="controls">
-      <label>Gender
-        <select id="gender">
-          <option value="male">Male</option>
-          <option value="female">Female</option>
-        </select>
-      </label>
+    <label>Gender
+      <select id="gender">
+        <option value="male">Male</option>
+        <option value="female">Female</option>
+      </select>
+    </label>
 
-      <label>Age
-        <input type="number" id="age" min="17" max="80" value="25">
-      </label>
+    <label>Age
+      <input type="number" id="age" min="17" max="80">
+    </label>
 
-      <label>Cardio
-        <select id="cardio">
-          <option value="run">2-Mile Run</option>
-          <option value="hamr">HAMR</option>
-        </select>
-      </label>
-    </div>
+    <label>Cardio
+      <select id="cardio">
+        <option value="run">2-Mile Run</option>
+        <option value="hamr">HAMR</option>
+      </select>
+    </label>
 
-    <!-- ✅ THIS BUTTON WILL SHOW -->
     <button type="submit" class="calc-btn">
       Calculate Minimums
     </button>
   </form>
 
-  <div class="cards">
-    <div class="card" id="card-upper"></div>
-    <div class="card" id="card-core"></div>
-    <div class="card" id="card-cardio"></div>
-  </div>
+  <div id="results" class="results"></div>
+
+  <a href="calculator.html" class="calc-btn">
+    ← Back to Calculator
+  </a>
 </div>
 
-<!-- External JS -->
 <script src="minimums.js"></script>
 </body>
 </html>
