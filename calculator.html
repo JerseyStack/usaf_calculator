@@ -1,108 +1,58 @@
-function calculateScore() {
-  const output = document.getElementById("output");
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>USAF PT Calculator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
 
-  // ===============================
-  // Basic inputs
-  // ===============================
-  const gender = document.getElementById("gender").value;
-  const age = Number(document.getElementById("age").value);
+<a href="./index.html">← Home</a>
 
-  if (!age || age < 17) {
-    output.textContent = "Please enter a valid age.";
-    return;
-  }
+<h1>USAF PT Score Calculator</h1>
 
-  const bracket = ageToBracket(age);
-  const data = PT_DATA[gender][bracket];
+<label>
+  Gender:
+  <select id="gender">
+    <option value="male">Male</option>
+    <option value="female">Female</option>
+  </select>
+</label>
 
-  if (!data) {
-    output.textContent = "No PT data found for this age group.";
-    return;
-  }
+<label>
+  Age:
+  <input type="number" id="age" min="17" max="60">
+</label>
 
-  // ===============================
-  // Component selections
-  // ===============================
-  const cardioType = document.querySelector('input[name="cardio"]:checked')?.value;
-  const upperType  = document.querySelector('input[name="upper"]:checked')?.value;
-  const coreType   = document.querySelector('input[name="core"]:checked')?.value;
+<hr>
 
-  if (!cardioType || !upperType || !coreType) {
-    output.textContent = "Please select one option for each category.";
-    return;
-  }
+<h3>Cardio</h3>
+<label><input type="radio" name="cardio" value="run"> 1.5 Mile Run</label>
+<label><input type="radio" name="cardio" value="hamr"> HAMR</label>
+<input id="cardio-input" placeholder="e.g. 15:30 or 75">
 
-  // ===============================
-  // Raw values
-  // ===============================
-  const cardioVal = document.getElementById("cardio-input").value;
-  const upperVal  = document.getElementById("upper-input").value;
-  const coreVal   = document.getElementById("core-input").value;
+<h3>Upper Body</h3>
+<label><input type="radio" name="upper" value="pushups"> Push-ups</label>
+<label><input type="radio" name="upper" value="handRelease"> Hand-Release Push-ups</label>
+<input id="upper-input" placeholder="reps">
 
-  const waist  = Number(document.getElementById("waist").value);
-  const height = Number(document.getElementById("height").value);
+<h3>Core</h3>
+<label><input type="radio" name="core" value="plank"> Plank</label>
+<label><input type="radio" name="core" value="situps"> Sit-ups</label>
+<input id="core-input" placeholder="e.g. 2:00 or reps">
 
-  if (!cardioVal || !upperVal || !coreVal || !waist || !height) {
-    output.textContent = "Please fill out all fields.";
-    return;
-  }
+<hr>
 
-  // ===============================
-  // Scoring
-  // ===============================
-  let total = 0;
+<h3>Body Composition</h3>
+<label>Waist (in): <input id="waist" type="number"></label>
+<label>Height (in): <input id="height" type="number"></label>
 
-  // Cardio
-  const cardioScore = scoreFromTable(
-    data[cardioType],
-    cardioVal,
-    cardioType === "run"
-  );
-  total += cardioScore;
+<hr>
 
-  // Upper body
-  const upperScore = scoreFromTable(
-    data[upperType],
-    upperVal
-  );
-  total += upperScore;
+<button id="calcBtn">Calculate</button>
 
-  // Core
-  const coreScore = scoreFromTable(
-    data[coreType],
-    coreVal,
-    coreType === "plank"
-  );
-  total += coreScore;
+<div id="output" style="margin-top:1rem;"></div>
 
-  // WHtR
-  const whtr = +(waist / height).toFixed(2);
-  const whtrScore = scoreFromTable(PT_DATA.whtr, whtr);
-  total += whtrScore;
-
-  // ===============================
-  // Pass / Fail
-  // ===============================
-  const pass =
-    total >= PT_DATA.compositeCategories.satisfactoryMin;
-
-  // ===============================
-  // Output
-  // ===============================
-  output.innerHTML = `
-    <h3>Total Score: ${total.toFixed(1)}</h3>
-    <strong>Status:</strong>
-    <span style="color:${pass ? "green" : "red"}">
-      ${pass ? "PASS" : "FAIL"}
-    </span>
-    <hr>
-    <ul>
-      <li>Cardio (${cardioType}): ${cardioScore.toFixed(1)}</li>
-      <li>Upper (${upperType}): ${upperScore.toFixed(1)}</li>
-      <li>Core (${coreType}): ${coreScore.toFixed(1)}</li>
-      <li>Waist-to-Height Ratio: ${whtrScore.toFixed(1)}</li>
-    </ul>
-  `;
-}
-
-  <script type="module" src="./js/calculator.js"></script>
+<script type="module" src="./js/calculator.js"></script>
+</body>
+</html>
