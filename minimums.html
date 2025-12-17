@@ -1,62 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>USAF PT Minimums</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="styles.css">
-
-  <!-- --------------------------------------------------------------
-       You can keep the CSS inside a separate file, but for a single‑
-       page demo it’s easier to leave it inline (as you already had). -->
-  <style>
-    body{
-      font-family:Arial,Helvetica,sans-serif;
-      background:#f2f2f2;
-      margin:0;
-      padding:1rem;
-    }
-    .card{
-      max-width:520px;
-      background:#fff;
-      margin:auto;
-      padding:1.5rem;
-      border-radius:8px;
-      box-shadow:0 2px 8px rgba(0,0,0,.08);
-    }
-    h1{ text-align:center;margin-bottom:.5rem;}
-    .note{ text-align:center;font-size:.9rem;color:#444;margin-bottom:1rem;}
-    .summary{
-      background:#eef5fb;
-      padding:.75rem;
-      border-radius:6px;
-      margin-bottom:1rem;
-      font-size:.9rem;
-    }
-    label{ display:block;margin-top:.75rem;}
-    select, input{
-      width:100%;
-      padding:.5rem;
-      margin-top:.25rem;
-    }
-    .calc-btn{
-      display:block;
-      width:100%;
-      margin-top:1rem;
-      padding:.8rem;
-      font-size:1rem;
-      font-weight:bold;
-      background:#005A9C;
-      color:#fff;
-      border:none;
-      border-radius:6px;
-      cursor:pointer;
-      text-align:center;
-      text-decoration:none;
-    }
-    .calc-btn:hover{ background:#004b82; }
-    .results{ margin-top:1.25rem;font-size:.95rem; }
-  </style>
+  …
 </head>
 
 <body>
@@ -65,32 +10,14 @@
 
     <p class="note">
       Minimum component scores required to reach <strong>75 points</strong>,
-      assuming maximum cardio.
+      assuming maximum cardio, upper‑body or core.
     </p>
 
     <div id="summary" class="summary"></div>
 
+    <!-- NOTE: the form now has an explicit ID for the script -->
     <form id="ptForm">
-      <label>Gender
-        <select id="gender">
-          <option value="male">Male</option>
-          <option value="female">Female</option>
-        </select>
-      </label>
-
-      <label>Age
-        <input type="number" id="age" min="17" max="80" placeholder="e.g. 24">
-      </label>
-
-      <fieldset style="margin-top:.75rem;border:none;padding:0;">
-        <legend>Assumption</legend>
-
-        <label><input type="radio" name="assumption" value="cardio" checked> Max Cardio</label><br><br>
-        <label><input type="radio" name="assumption" value="upper"> Max Upper Body</label><br><br>
-        <label><input type="radio" name="assumption" value="core"> Max Core</label>
-      </fieldset>
-
-      <button type="submit" class="calc-btn">Calculate Minimums</button>
+      …
     </form>
 
     <div id="results" class="results"></div>
@@ -98,7 +25,8 @@
     <a href="calculator.html" class="calc-btn">← Back to Calculator</a>
   </div>
 
-  <!-- Load the JS *after* the page markup so the elements already exist -->
+  <!-- 1️⃣ Load the data first, then the calculator logic -->
+  <script src="pt-data.js"></script>
   <script src="minimums.js" type="module"></script>
 </body>
 </html>
