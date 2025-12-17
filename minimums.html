@@ -70,6 +70,7 @@
     border-radius: 6px;
     cursor: pointer;
     text-align: center;
+    text-decoration: none;
   }
 
   .calc-btn:hover {
@@ -96,6 +97,7 @@
   <div id="summary" class="summary"></div>
 
   <form id="ptForm">
+
     <label>Gender
       <select id="gender">
         <option value="male">Male</option>
@@ -124,80 +126,16 @@
       </div>
     </label>
 
-    <button type="submit" class="calc-btn">
-      Calculate Minimums
-    </button>
+    <button type="submit" class="calc-btn">Calculate Minimums</button>
   </form>
 
   <div id="results" class="results"></div>
 
-  <a href="calculator.html" class="calc-btn">
-    ← Back to Calculator
+  <a href="index.html" class="calc-btn">
+    ← Back to Home Page
   </a>
 </div>
 
-<script>
-// --- PT Tables ---
-const cardioTable = {50:"9:12",45:"10:00",40:"11:00",35:"12:30",30:"14:00",25:"15:30",20:"16:30",15:"17:30",10:"18:30"};
-const upperTable  = {50:67,45:60,40:55,35:49,30:45,25:40,20:35,15:30,10:25};
-const coreTable   = {50:58,45:54,40:50,35:45,30:42,25:38,20:34,15:30,10:25};
-
-function convert(points, table) {
-  const keys = Object.keys(table).map(Number).sort((a,b)=>b-a);
-  for (let k of keys) if (points >= k) return table[k];
-  return "N/A";
-}
-
-function calculateMinimums() {
-  const ageEl = document.getElementById("age");
-  const resultsEl = document.getElementById("results");
-  const age = Number(ageEl.value);
-
-  if (!age) {
-    resultsEl.innerHTML = "<em>Please enter your age.</em>";
-    return;
-  }
-
-  const targetScore = 75;
-  const maxComponent = 50;
-
-  const assumption = document.querySelector('input[name="assumption"]:checked').value;
-
-  let cardioPts=0, upperPts=0, corePts=0;
-
-  if (assumption==="cardio") {
-    cardioPts=maxComponent;
-    const remaining = targetScore-cardioPts;
-    upperPts=corePts=Math.ceil(remaining/2);
-  } else if (assumption==="upper") {
-    upperPts=maxComponent;
-    const remaining = targetScore-upperPts;
-    cardioPts=corePts=Math.ceil(remaining/2);
-  } else if (assumption==="core") {
-    corePts=maxComponent;
-    const remaining = targetScore-corePts;
-    cardioPts=upperPts=Math.ceil(remaining/2);
-  }
-
-  const cardioReq = convert(cardioPts, cardioTable);
-  const upperReq = convert(upperPts, upperTable);
-  const coreReq = convert(corePts, coreTable);
-
-  resultsEl.innerHTML = `
-    <strong>Minimum Performance to Reach 75:</strong><br><br>
-    Cardio (${cardioPts} pts): <strong>${cardioReq}</strong><br>
-    Upper Body (${upperPts} pts): <strong>${upperReq} reps</strong><br>
-    Core (${corePts} pts): <strong>${coreReq} reps</strong><br><br>
-    <em>Approximate standards for planning only.</em>
-  `;
-}
-
-// --- Hook form submit ---
-document.getElementById("ptForm").addEventListener("submit", e => {
-  e.preventDefault();
-  calculateMinimums();
-});
-</script>
-
+<script src="minimums.js"></script>
 </body>
 </html>
