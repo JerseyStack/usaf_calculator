@@ -1,102 +1,105 @@
-const PASSING_SCORE = 75;
+/* ===========================
+   CONFIG
+=========================== */
+const TARGET = {
+  cardio: 50,
+  upper: 12.5,
+  core: 12.5
+};
 
-// ---------------- Helpers ----------------
-function ageToBracket(age) {
+/* ===========================
+   ELEMENTS
+=========================== */
+const form = document.getElementById("ptForm");
+const genderEl = document.getElementById("gender");
+const ageEl = document.getElementById("age");
+const cardioEl = document.getElementById("cardio");
+
+const cardUpper = document.getElementById("card-upper");
+const cardCore = document.getElementById("card-core");
+const cardCardio = document.getElementById("card-cardio");
+
+/* ===========================
+   HELPERS
+=========================== */
+function getAgeBracket(age) {
   if (age < 25) return "<25";
   if (age <= 29) return "25-29";
   if (age <= 34) return "30-34";
   if (age <= 39) return "35-39";
   if (age <= 44) return "40-44";
   if (age <= 49) return "45-49";
-  return null;
+  if (age <= 54) return "50-54";
+  if (age <= 59) return "55-59";
+  return "60+";
 }
 
-function findMetric(table, target, isTime = false) {
-  let result = null;
-
-  for (const key in table) {
-    if (table[key] >= target) {
-      if (!result) result = key;
-      if (isTime && key > result) result = key;
-      if (!isTime && +key < +result) result = key;
+function findMinimum(table, target) {
+  let min = null;
+  for (const value in table) {
+    if (table[value] >= target) {
+      if (!min || Number(value) < Number(min)) {
+        min = value;
+      }
     }
   }
-  return result ?? "N/A";
+  return min ?? "N/A";
 }
 
-// ---------------- Profiles ----------------
-function buildProfiles(data, cardioType) {
-  return [
-    {
-      title: "🅰 Strength-Focused",
-      push: 15,
-      core: 10
-    },
-    {
-      title: "🅱 Core-Focused",
-      push: 10,
-      core: 15
-    },
-    {
-      title: "🅲 Cardio-Focused",
-      push: 10,
-      core: 10,
-      cardio: 50
-    }
-  ].map(p => {
-    const cardioScore =
-      p.cardio ?? PASSING_SCORE - (p.push + p.core);
+/* ===========================
+   MAIN
+=========================== */
+function update() {
+  const gender = genderEl.value;
+  const age = parseInt(ageEl.value, 10);
+  const cardioType = cardioEl.value;
+  const bracket = getAgeBracket(age);
 
-    return {
-      title: p.title,
-      pushups: p.push === 15 ? "MAX" : findMetric(data.pushups, p.push),
-      plank: p.core === 15 ? "MAX" : findMetric(data.plank, p.core, true),
-      cardio:
-        p.cardio === 50
-          ? "MAX"
-          : findMetric(data[cardioType], cardioScore, cardioType === "run"),
-      total: p.push + p.core + cardioScore
-    };
-  });
+  const data = PT_DATA[gender][bracket];
+
+  const pushups = findMinimum(data.pushups, TARGET.upper);
+  const handRelease = data.handRelease
+    ? findMinimum(data.handRelease, TARGET.upper)
+    : "—";
+
+  const situps = findMinimum(data.situps, TARGET.core);
+  const crunch = data.crunch
+    ? findMinimum(data.crunch, TARGET.core)
+    : "—";
+  const plank = data.plank
+    ? findMinimum(data.plank, TARGET.core)
+    : "—";
+
+  const cardio = findMinimum(data[cardioType], TARGET.cardio);
+
+  cardUpper.innerHTML = `
+    <h2>Upper Body (12.5 pts)</h2>
+    <div class="value">Push-ups: ${pushups}</div>
+    <div class="value">Hand-Release: ${handRelease}</div>
+    <div class="note">Choose the easier option</div>
+  `;
+
+  cardCore.innerHTML = `
+    <h2>Core (12.5 pts)</h2>
+    <div class="value">Sit-ups: ${situps}</div>
+    <div class="value">Crunches: ${crunch}</div>
+    <div class="value">Plank: ${plank}</div>
+    <div class="note">Any one counts</div>
+  `;
+
+  cardCardio.innerHTML = `
+    <h2>Cardio (50 pts)</h2>
+    <div class="value">
+      ${cardioType === "run" ? "2-Mile Run" : "HAMR"}: ${cardio}
+    </div>
+    <div class="note">Maxing cardio gives the most buffer</div>
+  `;
 }
 
-// ---------------- UI ----------------
-document.getElementById("calcBtn").onclick = () => {
-  const gender = document.getElementById("gender").value;
-  const age = +document.getElementById("age").value;
-  const cardioType = document.getElementById("cardioType").value;
-  const results = document.getElementById("results");
-
-  results.innerHTML = "";
-
-  if (!age) {
-    results.textContent = "Please enter your age.";
-    return;
-  }
-
-  const bracket = ageToBracket(age);
-  const data = PT_DATA?.[gender]?.[bracket];
-
-  if (!data) {
-    results.textContent = "Age group not supported yet.";
-    return;
-  }
-
-  buildProfiles(data, cardioType).forEach(p => {
-    const card = document.createElement("div");
-    card.style.border = "1px solid #ccc";
-    card.style.padding = "1rem";
-    card.style.marginBottom = "1rem";
-
-    card.innerHTML = `
-      <h3>${p.title}</h3>
-      <ul>
-        <li>Cardio (${cardioType}): ${p.cardio}</li>
-        <li>Pushups: ${p.pushups}</li>
-        <li>Plank: ${p.plank}</li>
-        <li><strong>Total: ${p.total}</strong></li>
-      </ul>
-    `;
-    results.appendChild(card);
-  });
-};
+/* ===========================
+   EVENTS
+=========================== */
+form.addEventListener("submit", function (e) {
+  e.preventDefault();
+  update();
+});
