@@ -11,6 +11,20 @@ body {font-family:Arial,Helvetica,sans-serif;margin:0;padding:0 1rem;background:
 border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.15);}
 h1 {text-align:center;margin-bottom:1rem;}
 .controls {display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:2rem;}
+  <div style="margin-bottom:2rem;text-align:center;">
+  <button id="calculateBtn" style="
+    padding:.75rem 1.5rem;
+    font-size:1rem;
+    font-weight:600;
+    background:#005A9C;
+    color:#fff;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+  ">
+    Calculate Minimums
+  </button>
+</div>
 label {font-weight:600;display:flex;flex-direction:column;}
 select,input {
 padding:.6rem;font-size:1rem;border:1px solid #999;border-radius:4px;
@@ -580,12 +594,7 @@ function update() {
     <div class="note">Max score for buffer</div>
   `;
 }
-
-genderEl.addEventListener("change", update);
-ageEl.addEventListener("input", update);
-cardioEl.addEventListener("change", update);
-
-update();
+document.getElementById("calculateBtn").addEventListener("click", update);
 </script>
 
   
