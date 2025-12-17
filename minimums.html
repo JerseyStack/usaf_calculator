@@ -1,32 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  …
+  <meta charset="UTF-8">
+  <title>USAF PT Minimum Calculator</title>
+  <link rel="stylesheet" href="css/style.css">
+  <!-- Load jQuery – required only if you keep the jQuery version of the script -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+          integrity="sha256-3ed/…"
+          crossorigin="anonymous"></script>
 </head>
-
 <body>
-  <div class="card">
-    <h1>PT Minimums</h1>
 
-    <p class="note">
-      Minimum component scores required to reach <strong>75 points</strong>,
-      assuming maximum cardio, upper‑body or core.
-    </p>
+<h1>PT Minimum Calculator</h1>
 
-    <div id="summary" class="summary"></div>
+<form id="pt-form">
+  <label>Gender
+    <select id="gender">
+      <option value="M">Male</option>
+      <option value="F">Female</option>
+    </select>
+  </label>
+  <label>Age <input type="number" id="age" min="17" max="59" required></label>
+  <label>Push‑ups <input type="number" id="pushups" min="0" required></label>
+  <label>Sit‑ups <input type="number" id="situps" min="0" required></label>
+  <label>Run (mm:ss) <input type="text" id="run_time"
+         placeholder="09:30" pattern="^\d{1,2}:\d{2}$" required></label>
+  <button type="submit">Calculate</button>
+</form>
 
-    <!-- NOTE: the form now has an explicit ID for the script -->
-    <form id="ptForm">
-      …
-    </form>
+<hr>
+<div id="result"></div>
 
-    <div id="results" class="results"></div>
-
-    <a href="calculator.html" class="calc-btn">← Back to Calculator</a>
-  </div>
-
-  <!-- 1️⃣ Load the data first, then the calculator logic -->
-  <script src="pt-data.js"></script>
-  <script src="minimums.js" type="module"></script>
+<!-- YOUR SCRIPT – note the relative path! -->
+<script src="js/minimums.js" defer></script>
 </body>
 </html>
