@@ -1,324 +1,116 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>USAF PT Calculator</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<style>
-  body {font-family:Arial,Helvetica,sans-serif;margin:0;padding:0 1rem;background:#f2f2f2;}
-  .wrapper {max-width:800px;margin:2rem auto;background:#fff;padding:1.5rem;
-            border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.15);}
-  h1 {text-align:center;margin-bottom:1.5rem;}
-  form {display:flex;flex-direction:column;gap:1.5rem;}
-  fieldset {border:1px solid #999;padding:1rem;border-radius:5px;}
-  legend {font-weight:bold;padding:0 .5rem;}
-  label {display:flex;flex-direction:column;font-weight:600;}
-  .radio-group {display:flex;flex-wrap:wrap;gap:.5rem 1.5rem;margin-bottom:1rem;}
-  .input-group {margin-top:.5rem;}
-  input[type="text"], input[type="number"], select, button {
-    width:100%;padding:.6rem;font-size:1rem;
-    border:1px solid #999;border-radius:4px;box-sizing:border-box;
-  }
-  button {background:#005A9C;color:#fff;cursor:pointer;font-weight:600;margin-top:1rem;}
-  button:hover {background:#003087;}
-  .result {margin-top:2rem;padding:1rem;border:2px solid #444;background:#fafafa;border-radius:5px;}
-  .pass {color:#006400;font-weight:bold;}
-  .fail {color:#C8102E;font-weight:bold;}
-  @media (max-width:400px){
-    h1{font-size:1.5rem}
-    select,button,input{font-size:.95rem}
-  }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fitness Assessment Standards</title>
+    <style>
+        :root { --bg: #ffffff; --text: #212529; --border: #dee2e6; --header: #f8f9fa; --alt: #f2f2f2; }
+        body { font-family: -apple-system, system-ui, sans-serif; line-height: 1.4; color: var(--text); background: var(--bg); margin: 0; padding: 20px; }
+        .container { max-width: 1100px; margin: auto; }
+        h2 { border-bottom: 2px solid #0056b3; padding-bottom: 5px; color: #0056b3; }
+        .table-wrapper { overflow-x: auto; margin-bottom: 40px; border: 1px solid var(--border); }
+        table { width: 100%; border-collapse: collapse; white-space: nowrap; font-size: 13px; }
+        th, td { border: 1px solid var(--border); padding: 8px; text-align: center; }
+        th { background: var(--header); font-weight: 700; position: sticky; left: 0; z-index: 1; }
+        tr:nth-child(even) { background: var(--alt); }
+        .sticky-col { position: sticky; left: 0; background: var(--header); font-weight: bold; }
+        .pass-tier { background-color: #d4edda !important; }
+        .fail-tier { background-color: #f8d7da !important; }
+        .wthr-table td { padding: 12px; }
+    </style>
 </head>
 <body>
-<div class="wrapper">
-  <h1>USAF PT Calculator</h1>
-  <form id="ptForm">
-    <fieldset>
-      <legend>Demographics</legend>
-      <label>Gender
-        <select id="gender" required>
-          <option value="male">Male</option>
-          <option value="female">Female</option>
-        </select>
-      </label>
-      <label>Age (years)
-        <input type="number" id="age" min="17" max="80" required placeholder="e.g., 27" inputmode="numeric">
-      </label>
-    </fieldset>
-    <fieldset>
-      <legend>Cardio Component</legend>
-      <div class="radio-group">
-          <label><input type="radio" name="cardio" value="run" checked> 2‑Mile Run</label>
-          <label><input type="radio" name="cardio" value="hamr"> HAMR Shuttle</label>
-      </div>
-      <div class="input-group">
-        <label id="cardio-label">Score (mm:ss for Run, Reps for HAMR)</label>
-        <input type="text" id="cardio-input" placeholder="e.g., 14:30" required>
-      </div>
-    </fieldset>
-    <fieldset>
-      <legend>Upper-Body Component</legend>
-      <div class="radio-group">
-        <label><input type="radio" name="upper" value="pushups" checked> Push‑ups (1 min)</label>
-        <label><input type="radio" name="upper" value="handRelease"> Hand-Release Push‑ups (2 min)</label>
-      </div>
-      <div class="input-group">
-        <label>Repetitions</label>
-        <input type="number" id="upper-input" placeholder="e.g., 45" inputmode="numeric" required>
-      </div>
-    </fieldset>
-    <fieldset>
-      <legend>Core Component</legend>
-      <div class="radio-group">
-        <label><input type="radio" name="core" value="situps" checked> Sit‑ups (1 min)</label>
-        <label><input type="radio" name="core" value="crunch"> Cross-Leg Reverse Crunch (2 min)</label>
-        <label><input type="radio" name="core" value="plank"> Forearm Plank (mm:ss)</label>
-      </div>
-      <div class="input-group">
-        <label id="core-label">Score (Reps or mm:ss)</label>
-        <input type="text" id="core-input" placeholder="e.g., 50" required>
-      </div>
-    </fieldset>
-    <button type="submit">Calculate Score</button>
-  </form>
-  <div id="output" class="result" style="display:none;"></div>
+
+<div class="container">
+    <h2>Push-Up Scoring (Full Age Standards)</h2>
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th rowspan="2" class="sticky-col">Points</th>
+                    <th colspan="2">&lt;25</th>
+                    <th colspan="2">25-29</th>
+                    <th colspan="2">30-34</th>
+                    <th colspan="2">35-39</th>
+                    <th colspan="2">40-44</th>
+                    <th colspan="2">45-49</th>
+                    <th colspan="2">50-54</th>
+                    <th colspan="2">55-59</th>
+                    <th colspan="2">60+</th>
+                </tr>
+                <tr>
+                    <th>M</th><th>F</th><th>M</th><th>F</th><th>M</th><th>F</th><th>M</th><th>F</th><th>M</th><th>F</th><th>M</th><th>F</th><th>M</th><th>F</th><th>M</th><th>F</th><th>M</th><th>F</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="pass-tier">
+                    <td class="sticky-col">15.0</td>
+                    <td>67</td><td>50</td><td>63</td><td>47</td><td>60</td><td>44</td><td>56</td><td>42</td><td>52</td><td>39</td><td>49</td><td>36</td><td>45</td><td>34</td><td>42</td><td>31</td><td>38</td><td>28</td>
+                </tr>
+                <tr>
+                    <td class="sticky-col">14.5</td>
+                    <td>66</td><td>49</td><td>62</td><td>46</td><td>59</td><td>42</td><td>55</td><td>41</td><td>51</td><td>38</td><td>47</td><td>35</td><td>44</td><td>33</td><td>41</td><td>30</td><td>37</td><td>27</td>
+                </tr>
+                <tr>
+                    <td class="sticky-col">14.0</td>
+                    <td>64</td><td>48</td><td>61</td><td>45</td><td>57</td><td>41</td><td>54</td><td>40</td><td>50</td><td>37</td><td>46</td><td>34</td><td>42</td><td>32</td><td>40</td><td>29</td><td>36</td><td>26</td>
+                </tr>
+                <tr>
+                    <td class="sticky-col">13.5</td>
+                    <td>63</td><td>47</td><td>59</td><td>44</td><td>56</td><td>40</td><td>53</td><td>39</td><td>49</td><td>36</td><td>45</td><td>33</td><td>41</td><td>31</td><td>39</td><td>28</td><td>35</td><td>25</td>
+                </tr>
+                <tr>
+                    <td class="sticky-col">13.0</td>
+                    <td>61</td><td>46</td><td>58</td><td>43</td><td>54</td><td>39</td><td>51</td><td>38</td><td>48</td><td>35</td><td>44</td><td>32</td><td>40</td><td>30</td><td>38</td><td>27</td><td>34</td><td>24</td>
+                </tr>
+                <tr>
+                    <td class="sticky-col">10.0</td>
+                    <td>52</td><td>40</td><td>49</td><td>37</td><td>45</td><td>34</td><td>43</td><td>33</td><td>40</td><td>30</td><td>37</td><td>28</td><td>33</td><td>26</td><td>31</td><td>23</td><td>28</td><td>21</td>
+                </tr>
+                <tr class="fail-tier">
+                    <td class="sticky-col">Minimum</td>
+                    <td>30</td><td>15</td><td>27</td><td>14</td><td>24</td><td>12</td><td>21</td><td>10</td><td>19</td><td>9</td><td>16</td><td>8</td><td>13</td><td>7</td><td>11</td><td>6</td><td>10</td><td>5</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Waist-to-Height Ratio (WtHR) Scoring</h2>
+    <div class="table-wrapper">
+        <table class="wthr-table">
+            <thead>
+                <tr>
+                    <th>Risk Category</th>
+                    <th>Ratio Range (Waist &divide; Height)</th>
+                    <th>Points</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="border-left: 10px solid #28a745;">
+                    <td><strong>Low Risk</strong></td>
+                    <td>Less than 0.490</td>
+                    <td><strong>20.0</strong></td>
+                </tr>
+                <tr style="border-left: 10px solid #ffc107;">
+                    <td><strong>Moderate Risk</strong></td>
+                    <td>0.490 to 0.519</td>
+                    <td><strong>15.0</strong></td>
+                </tr>
+                <tr style="border-left: 10px solid #fd7e14;">
+                    <td><strong>High Risk</strong></td>
+                    <td>0.520 to 0.549</td>
+                    <td><strong>10.0</strong></td>
+                </tr>
+                <tr style="border-left: 10px solid #dc3545;">
+                    <td><strong>Very High Risk</strong></td>
+                    <td>0.550 or Greater</td>
+                    <td><strong>0.0</strong></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </div>
 
-<script>
-// Helper to parse MM:SS into total seconds
-function timeToSeconds(timeStr) {
-  if (!timeStr.includes(':')) return parseInt(timeStr) * 60; // fallback
-  const parts = timeStr.split(':');
-  return parseInt(parts[0]) * 60 + parseInt(parts[1]);
-}
-
-// Structure: Array of [threshold, points]. 
-// Evaluated from top to bottom. Order matters.
-const PT_DATA = {
-  "male": {
-    "<25": {
-      // Run: lower is better. Threshold is in seconds.
-      "run": [
-        [timeToSeconds("13:25"), 50.0], [timeToSeconds("13:44"), 49.5], 
-        [timeToSeconds("14:03"), 49.0], [timeToSeconds("14:22"), 48.0],
-        [timeToSeconds("14:41"), 47.0], [timeToSeconds("15:00"), 46.0],
-        [timeToSeconds("15:19"), 45.0], [timeToSeconds("15:38"), 44.0],
-        [timeToSeconds("15:57"), 43.0], [timeToSeconds("16:16"), 42.0],
-        [timeToSeconds("16:35"), 41.0], [timeToSeconds("16:54"), 40.0],
-        [timeToSeconds("17:13"), 39.0], [timeToSeconds("17:32"), 38.5],
-        [timeToSeconds("17:51"), 38.0], [timeToSeconds("18:10"), 37.5],
-        [timeToSeconds("18:29"), 37.0], [timeToSeconds("18:48"), 36.5],
-        [timeToSeconds("19:07"), 36.0], [timeToSeconds("19:36"), 35.5],
-        [timeToSeconds("19:45"), 35.0]
-      ],
-      // Reps: higher is better.
-      "hamr": [
-        [87, 50.0], [84, 49.5], [81, 49.0], [78, 48.0], [75, 47.0], 
-        [72, 46.0], [70, 45.0], [67, 44.0], [65, 43.0], [63, 42.0],
-        [60, 41.0], [58, 40.0], [56, 39.0], [54, 38.5], [52, 38.0],
-        [51, 37.5], [49, 37.0], [47, 36.5], [46, 36.0], [44, 35.5],
-        [42, 35.0]
-      ],
-      "pushups": [
-        [67, 15.0], [66, 14.5], [64, 14.0], [63, 13.5], [61, 13.0], 
-        [60, 12.5], [58, 12.0], [57, 11.5], [55, 11.0], [54, 10.5], 
-        [52, 10.0], [51, 9.5], [49, 9.0], [48, 8.5], [46, 8.0], 
-        [45, 7.5], [43, 7.0], [42, 6.5], [40, 6.0], [39, 5.5], 
-        [37, 5.0], [36, 4.5], [34, 4.0], [33, 3.5], [31, 3.0], [30, 2.5]
-      ],
-      "handRelease": [
-        [52, 15.0], [51, 14.5], [50, 14.0], [49, 13.5], [48, 13.0], 
-        [47, 12.5], [46, 12.0], [45, 11.5], [44, 11.0], [43, 10.5], 
-        [42, 10.0], [41, 9.5], [40, 9.0], [39, 8.5], [38, 8.0], 
-        [37, 7.5], [36, 7.0], [35, 6.5], [34, 6.0], [33, 5.5], 
-        [32, 5.0], [31, 4.5], [30, 4.0], [29, 3.5], [28, 3.0], [27, 2.5]
-      ],
-      "situps": [
-        [58, 15.0], [57, 14.5], [56, 14.0], [55, 13.5], [54, 13.0], 
-        [53, 12.5], [52, 12.0], [51, 11.5], [50, 11.0], [49, 10.5], 
-        [48, 10.0], [47, 9.5], [46, 9.0], [45, 8.5], [44, 8.0], 
-        [43, 7.5], [42, 7.0], [41, 6.5], [40, 6.0], [39, 5.5], 
-        [38, 5.0], [37, 4.5], [36, 4.0], [35, 3.5], [34, 3.0], [33, 2.5]
-      ],
-      "crunch": [
-        [60, 15.0], [59, 14.5], [58, 14.0], [57, 13.5], [56, 13.0],
-        [55, 12.5], [54, 12.0], [53, 11.5], [52, 11.0], [51, 10.5],
-        [50, 10.0], [49, 9.5], [48, 9.0], [47, 8.5], [46, 8.0],
-        [45, 7.5], [44, 7.0], [43, 6.5], [42, 6.0], [41, 5.5],
-        [40, 5.0], [39, 4.5], [38, 4.0], [37, 3.5], [36, 3.0], [35, 2.5]
-      ],
-      "plank": [
-        [timeToSeconds("3:40"), 15.0], [timeToSeconds("3:35"), 14.5],
-        [timeToSeconds("3:30"), 14.0], [timeToSeconds("3:25"), 13.5],
-        [timeToSeconds("3:20"), 13.0], [timeToSeconds("3:15"), 12.5],
-        [timeToSeconds("3:10"), 12.0], [timeToSeconds("3:05"), 11.5],
-        [timeToSeconds("3:00"), 11.0], [timeToSeconds("2:55"), 10.5],
-        [timeToSeconds("2:50"), 10.0], [timeToSeconds("2:45"), 9.5],
-        [timeToSeconds("2:40"), 9.0], [timeToSeconds("2:35"), 8.5],
-        [timeToSeconds("2:30"), 8.0], [timeToSeconds("2:25"), 7.5],
-        [timeToSeconds("2:20"), 7.0], [timeToSeconds("2:15"), 6.5],
-        [timeToSeconds("2:10"), 6.0], [timeToSeconds("2:05"), 5.5],
-        [timeToSeconds("2:00"), 5.0], [timeToSeconds("1:55"), 4.5],
-        [timeToSeconds("1:50"), 4.0], [timeToSeconds("1:45"), 3.5],
-        [timeToSeconds("1:40"), 3.0], [timeToSeconds("1:35"), 2.5]
-      ]
-    }
-    // Add 25-29, 30-34, 35-39, etc., using the same logic above.
-  },
-  "female": {
-    "<25": {
-      "run": [
-        [timeToSeconds("15:30"), 50.0], [timeToSeconds("16:00"), 49.5], 
-        [timeToSeconds("16:29"), 49.0], [timeToSeconds("16:59"), 48.0],
-        [timeToSeconds("17:29"), 47.0], [timeToSeconds("17:58"), 46.0],
-        [timeToSeconds("18:28"), 45.0], [timeToSeconds("18:58"), 44.0],
-        [timeToSeconds("19:27"), 43.0], [timeToSeconds("19:57"), 42.0],
-        [timeToSeconds("20:27"), 41.0], [timeToSeconds("20:56"), 40.0],
-        [timeToSeconds("21:26"), 39.0], [timeToSeconds("21:55"), 38.5],
-        [timeToSeconds("22:25"), 38.0], [timeToSeconds("22:55"), 37.5],
-        [timeToSeconds("23:24"), 37.0], [timeToSeconds("23:54"), 36.5],
-        [timeToSeconds("24:24"), 36.0], [timeToSeconds("24:53"), 35.5],
-        [timeToSeconds("25:23"), 35.0]
-      ],
-      "hamr": [
-        [68, 50.0], [65, 49.5], [61, 49.0], [58, 48.0], [55, 47.0],
-        [52, 46.0], [49, 45.0], [46, 44.0], [44, 43.0], [41, 42.0],
-        [39, 41.0], [37, 40.0], [35, 39.0], [33, 38.5], [31, 38.0],
-        [29, 37.5], [28, 37.0], [26, 36.5], [24, 36.0], [23, 35.5],
-        [21, 35.0]
-      ],
-      "pushups": [
-        [50, 15.0], [49, 14.5], [47, 14.0], [46, 13.5], [44, 13.0], 
-        [43, 12.5], [42, 12.0], [40, 11.5], [39, 11.0], [37, 10.5], 
-        [36, 10.0], [35, 9.5], [33, 9.0], [32, 8.5], [30, 8.0], 
-        [29, 7.5], [28, 7.0], [26, 6.5], [25, 6.0], [23, 5.5], 
-        [22, 5.0], [20, 4.5], [18, 4.0], [16, 3.5], [15, 3.0], [15, 2.5]
-      ],
-      "handRelease": [
-        [42, 15.0], [41, 14.5], [40, 14.0], [39, 13.5], [38, 13.0], 
-        [37, 12.5], [36, 12.0], [35, 11.5], [34, 11.0], [33, 10.5], 
-        [32, 10.0], [31, 9.5], [30, 9.0], [29, 8.5], [28, 8.0], 
-        [27, 7.5], [26, 7.0], [25, 6.5], [24, 6.0], [23, 5.5], 
-        [22, 5.0], [21, 4.5], [20, 4.0], [19, 3.5], [18, 3.0], [17, 2.5]
-      ],
-      "situps": [
-        [54, 15.0], [53, 14.5], [52, 14.0], [51, 13.5], [50, 13.0], 
-        [49, 12.5], [48, 12.0], [47, 11.5], [46, 11.0], [45, 10.5], 
-        [44, 10.0], [43, 9.5], [42, 9.0], [41, 8.5], [40, 8.0], 
-        [39, 7.5], [38, 7.0], [37, 6.5], [36, 6.0], [35, 5.5], 
-        [34, 5.0], [33, 4.5], [32, 4.0], [31, 3.5], [30, 3.0], [29, 2.5]
-      ],
-      "crunch": [
-        [58, 15.0], [57, 14.5], [56, 14.0], [55, 13.5], [54, 13.0],
-        [53, 12.5], [52, 12.0], [51, 11.5], [50, 11.0], [49, 10.5],
-        [48, 10.0], [47, 9.5], [46, 9.0], [45, 8.5], [44, 8.0],
-        [43, 7.5], [42, 7.0], [41, 6.5], [40, 6.0], [39, 5.5],
-        [38, 5.0], [37, 4.5], [36, 4.0], [35, 3.5], [34, 3.0], [33, 2.5]
-      ],
-      "plank": [
-        [timeToSeconds("3:35"), 15.0], [timeToSeconds("3:30"), 14.5],
-        [timeToSeconds("3:25"), 14.0], [timeToSeconds("3:20"), 13.5],
-        [timeToSeconds("3:15"), 13.0], [timeToSeconds("3:10"), 12.5],
-        [timeToSeconds("3:05"), 12.0], [timeToSeconds("3:00"), 11.5],
-        [timeToSeconds("2:55"), 11.0], [timeToSeconds("2:50"), 10.5],
-        [timeToSeconds("2:45"), 10.0], [timeToSeconds("2:40"), 9.5],
-        [timeToSeconds("2:35"), 9.0], [timeToSeconds("2:30"), 8.5],
-        [timeToSeconds("2:25"), 8.0], [timeToSeconds("2:20"), 7.5],
-        [timeToSeconds("2:15"), 7.0], [timeToSeconds("2:10"), 6.5],
-        [timeToSeconds("2:05"), 6.0], [timeToSeconds("2:00"), 5.5],
-        [timeToSeconds("1:55"), 5.0], [timeToSeconds("1:50"), 4.5],
-        [timeToSeconds("1:45"), 4.0], [timeToSeconds("1:40"), 3.5],
-        [timeToSeconds("1:35"), 3.0], [timeToSeconds("1:30"), 2.5]
-      ]
-    }
-    // Add 25-29, 30-34, 35-39, etc.
-  }
-};
-
-// Map age input to exact bracket
-function getAgeGroup(age) {
-  if (age < 25) return "<25";
-  if (age <= 29) return "25-29";
-  if (age <= 34) return "30-34";
-  if (age <= 39) return "35-39";
-  if (age <= 44) return "40-44";
-  if (age <= 49) return "45-49";
-  if (age <= 54) return "50-54";
-  if (age <= 59) return "55-59";
-  return "60+";
-}
-
-// Calculate the score using threshold evaluation logic
-function calculateComponentScore(val, thresholds, isRun) {
-  if (!thresholds) return 0;
-  
-  for (let i = 0; i < thresholds.length; i++) {
-    let [threshold, points] = thresholds[i];
-    
-    // For Run: Lower time is better (so check if val <= threshold)
-    if (isRun) {
-      if (val <= threshold) return points;
-    } 
-    // For Reps and Plank: Higher is better (so check if val >= threshold)
-    else {
-      if (val >= threshold) return points;
-    }
-  }
-  return 0; // Failed to meet minimum threshold
-}
-
-// Main Event Listener
-document.getElementById('ptForm').addEventListener('submit', function(e) {
-  e.preventDefault();
-
-  const gender = document.getElementById('gender').value;
-  const age = parseInt(document.getElementById('age').value);
-  const ageGroup = getAgeGroup(age);
-
-  // Cardio values
-  const cardioType = document.querySelector('input[name="cardio"]:checked').value;
-  const cardioRaw = document.getElementById('cardio-input').value;
-  const cardioVal = (cardioType === 'run') ? timeToSeconds(cardioRaw) : parseInt(cardioRaw);
-
-  // Upper values
-  const upperType = document.querySelector('input[name="upper"]:checked').value;
-  const upperVal = parseInt(document.getElementById('upper-input').value);
-
-  // Core values
-  const coreType = document.querySelector('input[name="core"]:checked').value;
-  const coreRaw = document.getElementById('core-input').value;
-  const coreVal = (coreType === 'plank') ? timeToSeconds(coreRaw) : parseInt(coreRaw);
-
-  // Check if data block exists for this demographic
-  if (!PT_DATA[gender] || !PT_DATA[gender][ageGroup]) {
-    alert("Data not populated for this age group yet. Add it to PT_DATA!");
-    return;
-  }
-
-  const userGroupData = PT_DATA[gender][ageGroup];
-
-  // Evaluate Points
-  const cardioScore = calculateComponentScore(cardioVal, userGroupData[cardioType], cardioType === 'run');
-  const upperScore = calculateComponentScore(upperVal, userGroupData[upperType], false);
-  const coreScore = calculateComponentScore(coreVal, userGroupData[coreType], false);
-
-  const totalScore = cardioScore + upperScore + coreScore;
-  const passed = (totalScore >= 75) && (cardioScore > 0 && upperScore > 0 && coreScore > 0);
-
-  // Output formatting
-  const outputDiv = document.getElementById('output');
-  outputDiv.style.display = 'block';
-  outputDiv.innerHTML = `
-    <h3>Results</h3>
-    <p>Cardio (${cardioType}): ${cardioScore.toFixed(1)} pts</p>
-    <p>Upper (${upperType}): ${upperScore.toFixed(1)} pts</p>
-    <p>Core (${coreType}): ${coreScore.toFixed(1)} pts</p>
-    <hr>
-    <p><strong>Total Score: ${totalScore.toFixed(1)}</strong></p>
-    <p class="${passed ? 'pass' : 'fail'}">${passed ? 'PASS' : 'FAIL (Minimum score is 75, with passing marks in all categories)'}</p>
-  `;
-});
-</script>
 </body>
 </html>
