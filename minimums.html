@@ -95,7 +95,6 @@
         .pass-tier td:not(.sticky-col) { background-color: #d4edda !important; }
         .fail-tier td:not(.sticky-col) { background-color: #f8d7da !important; color: #721c24; font-weight: bold; border-top: 2px solid #721c24; }
         
-        /* WtHR SPECIFIC COLORS */
         .w-low { background-color: #d4edda !important; color: #155724; } 
         .w-mod { background-color: #fff3cd !important; color: #856404; } 
         .w-high { background-color: #ffe8d6 !important; color: #d35400; } 
@@ -116,8 +115,9 @@
         <span class="w-high">High Risk (10 pts)</span>
         <span class="w-fail">Very High Risk (0 pts)</span>
     </div>
+    
     <div class="table-wrapper">
-        <table style="min-width: 1400px;"> 
+        <table style="min-width: 2000px;"> 
             <thead>
                 <tr id="whtr-thead-row">
                     </tr>
@@ -417,36 +417,38 @@
             </tbody>
         </table>
     </div>
+
 </div>
 
 <script>
-// INSTANTLY CALCULATE AND POPULATE THE WtHR GRID TO SAVE 15KB OF HTML FILE SIZE
+// INSTANTLY CALCULATE AND POPULATE THE WtHR GRID
 document.addEventListener("DOMContentLoaded", function() {
     const thead = document.getElementById("whtr-thead-row");
     const tbody = document.getElementById("whtr-tbody");
     
-    // 1. Build Headers (28.0 to 44.0)
+    // 1. Build Headers (28.0 to 44.0 in 0.5 increments)
     let headHTML = '<th class="sticky-col">Ht \\ Wst</th>';
     for (let w = 28.0; w <= 44.0; w += 0.5) {
         headHTML += `<th>${w.toFixed(1)}"</th>`;
     }
     thead.innerHTML = headHTML;
     
-    // 2. Build Matrix Rows (58 to 78)
+    // 2. Build Matrix Rows (58.0 to 78.0 in 0.5 increments)
     let bodyHTML = '';
-    for (let h = 58; h <= 78; h++) {
-        bodyHTML += `<tr><th class="sticky-col">${h}"</th>`;
+    for (let h = 58.0; h <= 78.0; h += 0.5) {
+        bodyHTML += `<tr><th class="sticky-col">${h.toFixed(1)}"</th>`;
+        
         for (let w = 28.0; w <= 44.0; w += 0.5) {
-            // Divide and round to 2 decimal places to match Air Force calculation [cite: 1, 13]
-            const ratio = (w / h).toFixed(2);
-            const ratioNum = parseFloat(ratio);
+            // Calculate and round to 2 decimal places to match Air Force calculation
+            const ratioNum = Math.round((w / h) * 100) / 100;
+            const ratioStr = ratioNum.toFixed(2);
             
             let cls = 'w-fail';
             if (ratioNum < 0.49) cls = 'w-low';
             else if (ratioNum < 0.52) cls = 'w-mod';
             else if (ratioNum < 0.55) cls = 'w-high';
             
-            bodyHTML += `<td class="${cls}">${ratio.replace('0.', '.')}</td>`;
+            bodyHTML += `<td class="${cls}">${ratioStr.replace('0.', '.')}</td>`;
         }
         bodyHTML += `</tr>`;
     }
