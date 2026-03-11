@@ -111,13 +111,13 @@
     <h2>Waist-to-Height Ratio (WtHR) Matrix</h2>
     <div class="legend">
         <span class="w-low">Low Risk (20 pts)</span>
-        <span class="w-mod">Mod Risk (15 pts)</span>
-        <span class="w-high">High Risk (10 pts)</span>
+        <span class="w-mod">Moderate Risk (15 - 19 pts)</span>
+        <span class="w-high">High Risk (2.5 - 12.5 pts)</span>
         <span class="w-fail">Very High Risk (0 pts)</span>
     </div>
     
     <div class="table-wrapper">
-        <table style="min-width: 2000px;"> 
+        <table style="min-width: 2200px;"> 
             <thead>
                 <tr id="whtr-thead-row">
                     </tr>
@@ -444,7 +444,7 @@ document.addEventListener("DOMContentLoaded", function() {
             const ratioStr = ratioNum.toFixed(2);
             
             let cls = 'w-fail';
-            if (ratioNum < 0.49) cls = 'w-low';
+            if (ratioNum < 0.50) cls = 'w-low';
             else if (ratioNum < 0.52) cls = 'w-mod';
             else if (ratioNum < 0.55) cls = 'w-high';
             
