@@ -84,10 +84,10 @@
     </fieldset>
     <fieldset>
       <legend>Waist-to-Height Ratio (WHtR)</legend>
-      <label>Waist (inches, e.g., 34 or 34.5)
+      <label>Waist (inches)
         <input type="number" id="waist" min="10" max="80" step="0.5" required placeholder="e.g., 34.5" inputmode="decimal">
       </label>
-      <label>Height (inches, e.g., 70 or 70.5)
+      <label>Height (inches)
         <input type="number" id="height" min="48" max="84" step="0.5" required placeholder="e.g., 70.5" inputmode="decimal">
       </label>
     </fieldset>
@@ -97,9 +97,15 @@
 </div>
 
 <script>
+// ========================================================================
+// OFFICIAL POINT TIERS 
+// ========================================================================
 const PtsCardio = [50.0, 49.5, 49.0, 48.0, 47.0, 46.0, 45.0, 44.0, 43.0, 42.0, 41.0, 40.0, 39.0, 38.5, 38.0, 37.5, 37.0, 36.5, 36.0, 35.5, 35.0];
 const PtsUpperCore = [15.0, 14.5, 14.0, 13.5, 13.0, 12.5, 12.0, 11.5, 11.0, 10.5, 10.0, 9.5, 9.0, 8.5, 8.0, 7.5, 7.0, 6.5, 6.0, 5.5, 5.0, 4.5, 4.0, 3.5, 3.0, 2.5];
 
+// ========================================================================
+// BRACKET THRESHOLDS [Male Array, Female Array]
+// ========================================================================
 const PT_DATA = {
   "<25": {
     run: [
@@ -416,23 +422,28 @@ const lookupHigherIsBetter = (valArr, userVal, isCardio, isTime = false) => {
   return 0; // Fails to meet minimum
 };
 
-// WtHR handles exactly 20, 15, 10, or 0 points
+// WtHR calculates EXACT points based on the new point breakdown
 const lookupWhtr = (waist, height) => {
   if (!waist || !height) return { pts: 0, ratio: "N/A", category: "Invalid" };
   
-  // Calculate and round to exactly 2 decimal places to match Air Force logic
+  // Calculate and round to exactly 2 decimal places to match Air Force calculation rules
   const ratioNum = Math.round((waist / height) * 100) / 100;
   const ratioStr = ratioNum.toFixed(2);
   
-  if (ratioNum < 0.49) {
-      return { pts: 20.0, ratio: ratioStr, category: "Low Risk" };
-  } else if (ratioNum < 0.52) {
-      return { pts: 15.0, ratio: ratioStr, category: "Moderate Risk" };
-  } else if (ratioNum < 0.55) {
-      return { pts: 10.0, ratio: ratioStr, category: "High Risk" };
-  } else {
-      return { pts: 0.0, ratio: ratioStr, category: "Very High Risk" };
-  }
+  // Assign points strictly according to the new bracket
+  if (ratioNum < 0.50) return { pts: 20.0, ratio: ratioStr, category: "Low Risk" };
+  if (ratioNum === 0.50) return { pts: 19.0, ratio: ratioStr, category: "Moderate Risk" };
+  if (ratioNum === 0.51) return { pts: 18.0, ratio: ratioStr, category: "Moderate Risk" };
+  if (ratioNum === 0.52) return { pts: 17.0, ratio: ratioStr, category: "Moderate Risk" };
+  if (ratioNum === 0.53) return { pts: 16.0, ratio: ratioStr, category: "Moderate Risk" };
+  if (ratioNum === 0.54) return { pts: 15.0, ratio: ratioStr, category: "Moderate Risk" };
+  if (ratioNum === 0.55) return { pts: 12.5, ratio: ratioStr, category: "High Risk" };
+  if (ratioNum === 0.56) return { pts: 10.0, ratio: ratioStr, category: "High Risk" };
+  if (ratioNum === 0.57) return { pts: 7.5, ratio: ratioStr, category: "High Risk" };
+  if (ratioNum === 0.58) return { pts: 5.0, ratio: ratioStr, category: "High Risk" };
+  if (ratioNum === 0.59) return { pts: 2.5, ratio: ratioStr, category: "High Risk" };
+  
+  return { pts: 0.0, ratio: ratioStr, category: "Very High Risk" };
 };
 
 // ========================================================================
