@@ -33,27 +33,23 @@
             font-size: 1.3rem;
         }
         
-        /* UNIFORM SIZE & SCROLL LOGIC */
         .table-wrapper { 
             overflow: auto; 
             margin-bottom: 20px; 
-            height: 400px; /* Uniform height for all charts */
+            height: 400px; 
             border: 1px solid #ccc; 
             box-shadow: 0 4px 8px rgba(0,0,0,0.05);
             background: var(--bg);
         }
         
-        /* Using border-collapse: separate is the industry secret to 
-           making sticky headers work perfectly without borders vanishing 
-        */
         table { 
             width: 100%; 
             border-collapse: separate; 
             border-spacing: 0;
             white-space: nowrap; 
             font-size: 13px; 
-            table-layout: fixed; /* Forces uniform column widths */
-            min-width: 950px; /* Forces horizontal scrolling on mobile */
+            table-layout: fixed; 
+            min-width: 950px; 
         }
         
         th, td { 
@@ -67,7 +63,6 @@
 
         tr:nth-child(even) td:not(.sticky-col) { background: var(--alt); }
 
-        /* STICKY ROW 1 (Ages / Main Header) */
         thead tr:nth-child(1) th { 
             position: sticky; 
             top: 0; 
@@ -77,32 +72,26 @@
             box-sizing: border-box;
         }
 
-        /* STICKY ROW 2 (Male/Female Sub-Header) */
         thead tr:nth-child(2) th { 
             position: sticky; 
-            top: 35px; /* Docks right below row 1 */
+            top: 35px; 
             background: var(--header); 
             z-index: 10; 
-            box-shadow: inset 0 -2px 0 #ccc; /* Visual separation line */
+            box-shadow: inset 0 -2px 0 #ccc; 
         }
 
-        /* STICKY LEFT COLUMN (Points) */
         .sticky-col { 
             position: sticky; 
             left: 0; 
             background: var(--header); 
             font-weight: bold; 
             z-index: 11; 
-            width: 60px; /* Uniform width for the Points column */
+            width: 60px; 
             border-right: 2px solid #ccc !important; 
         }
 
-        /* TOP LEFT CORNER (Must stay on top of BOTH scrolling axes) */
-        thead tr:nth-child(1) th.sticky-col { 
-            z-index: 15; 
-        }
+        thead tr:nth-child(1) th.sticky-col { z-index: 15; }
 
-        /* ROW HIGHLIGHTS */
         .pass-tier td:not(.sticky-col) { background-color: #d4edda !important; }
         .fail-tier td:not(.sticky-col) { background-color: #f8d7da !important; color: #721c24; font-weight: bold; border-top: 2px solid #721c24; }
         
@@ -128,36 +117,13 @@
         <span class="w-fail">Very High Risk (0 pts)</span>
     </div>
     <div class="table-wrapper">
-        <table>
+        <table style="min-width: 1400px;"> 
             <thead>
-                <tr>
-                    <th class="sticky-col">Ht \ Wst</th>
-                    <th>28"</th><th>29"</th><th>30"</th><th>31"</th><th>32"</th><th>33"</th><th>34"</th><th>35"</th><th>36"</th><th>37"</th><th>38"</th><th>39"</th><th>40"</th><th>41"</th><th>42"</th><th>43"</th><th>44"</th>
-                </tr>
+                <tr id="whtr-thead-row">
+                    </tr>
             </thead>
-            <tbody>
-                <tr><th class="sticky-col">58"</th><td class="w-low">.48</td><td class="w-mod">.50</td><td class="w-high">.52</td><td class="w-high">.53</td><td class="w-fail">.55</td><td class="w-fail">.57</td><td class="w-fail">.59</td><td class="w-fail">.60</td><td class="w-fail">.62</td><td class="w-fail">.64</td><td class="w-fail">.66</td><td class="w-fail">.67</td><td class="w-fail">.69</td><td class="w-fail">.71</td><td class="w-fail">.72</td><td class="w-fail">.74</td><td class="w-fail">.76</td></tr>
-                <tr><th class="sticky-col">59"</th><td class="w-low">.47</td><td class="w-mod">.49</td><td class="w-mod">.51</td><td class="w-high">.53</td><td class="w-high">.54</td><td class="w-fail">.56</td><td class="w-fail">.58</td><td class="w-fail">.59</td><td class="w-fail">.61</td><td class="w-fail">.63</td><td class="w-fail">.64</td><td class="w-fail">.66</td><td class="w-fail">.68</td><td class="w-fail">.69</td><td class="w-fail">.71</td><td class="w-fail">.73</td><td class="w-fail">.75</td></tr>
-                <tr><th class="sticky-col">60"</th><td class="w-low">.47</td><td class="w-low">.48</td><td class="w-mod">.50</td><td class="w-mod">.52</td><td class="w-high">.53</td><td class="w-fail">.55</td><td class="w-fail">.57</td><td class="w-fail">.58</td><td class="w-fail">.60</td><td class="w-fail">.62</td><td class="w-fail">.63</td><td class="w-fail">.65</td><td class="w-fail">.67</td><td class="w-fail">.68</td><td class="w-fail">.70</td><td class="w-fail">.72</td><td class="w-fail">.73</td></tr>
-                <tr><th class="sticky-col">61"</th><td class="w-low">.46</td><td class="w-low">.48</td><td class="w-mod">.49</td><td class="w-mod">.51</td><td class="w-high">.52</td><td class="w-high">.54</td><td class="w-fail">.56</td><td class="w-fail">.57</td><td class="w-fail">.59</td><td class="w-fail">.61</td><td class="w-fail">.62</td><td class="w-fail">.64</td><td class="w-fail">.66</td><td class="w-fail">.67</td><td class="w-fail">.69</td><td class="w-fail">.70</td><td class="w-fail">.72</td></tr>
-                <tr><th class="sticky-col">62"</th><td class="w-low">.45</td><td class="w-low">.47</td><td class="w-low">.48</td><td class="w-mod">.50</td><td class="w-mod">.52</td><td class="w-high">.53</td><td class="w-fail">.55</td><td class="w-fail">.56</td><td class="w-fail">.58</td><td class="w-fail">.60</td><td class="w-fail">.61</td><td class="w-fail">.63</td><td class="w-fail">.65</td><td class="w-fail">.66</td><td class="w-fail">.68</td><td class="w-fail">.69</td><td class="w-fail">.71</td></tr>
-                <tr><th class="sticky-col">63"</th><td class="w-low">.44</td><td class="w-low">.46</td><td class="w-low">.48</td><td class="w-mod">.49</td><td class="w-mod">.51</td><td class="w-high">.52</td><td class="w-high">.54</td><td class="w-fail">.56</td><td class="w-fail">.57</td><td class="w-fail">.59</td><td class="w-fail">.60</td><td class="w-fail">.62</td><td class="w-fail">.63</td><td class="w-fail">.65</td><td class="w-fail">.67</td><td class="w-fail">.68</td><td class="w-fail">.70</td></tr>
-                <tr><th class="sticky-col">64"</th><td class="w-low">.44</td><td class="w-low">.45</td><td class="w-low">.47</td><td class="w-low">.48</td><td class="w-mod">.50</td><td class="w-mod">.52</td><td class="w-high">.53</td><td class="w-fail">.55</td><td class="w-fail">.56</td><td class="w-fail">.58</td><td class="w-fail">.59</td><td class="w-fail">.61</td><td class="w-fail">.63</td><td class="w-fail">.64</td><td class="w-fail">.66</td><td class="w-fail">.67</td><td class="w-fail">.69</td></tr>
-                <tr><th class="sticky-col">65"</th><td class="w-low">.43</td><td class="w-low">.45</td><td class="w-low">.46</td><td class="w-low">.48</td><td class="w-mod">.49</td><td class="w-mod">.51</td><td class="w-high">.52</td><td class="w-high">.54</td><td class="w-fail">.55</td><td class="w-fail">.57</td><td class="w-fail">.58</td><td class="w-fail">.60</td><td class="w-fail">.62</td><td class="w-fail">.63</td><td class="w-fail">.65</td><td class="w-fail">.66</td><td class="w-fail">.68</td></tr>
-                <tr><th class="sticky-col">66"</th><td class="w-low">.42</td><td class="w-low">.44</td><td class="w-low">.45</td><td class="w-low">.47</td><td class="w-low">.48</td><td class="w-mod">.50</td><td class="w-mod">.52</td><td class="w-high">.53</td><td class="w-fail">.55</td><td class="w-fail">.56</td><td class="w-fail">.58</td><td class="w-fail">.59</td><td class="w-fail">.61</td><td class="w-fail">.62</td><td class="w-fail">.64</td><td class="w-fail">.65</td><td class="w-fail">.67</td></tr>
-                <tr><th class="sticky-col">67"</th><td class="w-low">.42</td><td class="w-low">.43</td><td class="w-low">.45</td><td class="w-low">.46</td><td class="w-low">.48</td><td class="w-mod">.49</td><td class="w-mod">.51</td><td class="w-high">.52</td><td class="w-high">.54</td><td class="w-fail">.55</td><td class="w-fail">.57</td><td class="w-fail">.58</td><td class="w-fail">.60</td><td class="w-fail">.61</td><td class="w-fail">.63</td><td class="w-fail">.64</td><td class="w-fail">.66</td></tr>
-                <tr><th class="sticky-col">68"</th><td class="w-low">.41</td><td class="w-low">.43</td><td class="w-low">.44</td><td class="w-low">.46</td><td class="w-low">.47</td><td class="w-low">.49</td><td class="w-mod">.50</td><td class="w-mod">.51</td><td class="w-high">.53</td><td class="w-high">.54</td><td class="w-fail">.56</td><td class="w-fail">.57</td><td class="w-fail">.59</td><td class="w-fail">.60</td><td class="w-fail">.62</td><td class="w-fail">.63</td><td class="w-fail">.65</td></tr>
-                <tr><th class="sticky-col">69"</th><td class="w-low">.41</td><td class="w-low">.42</td><td class="w-low">.43</td><td class="w-low">.45</td><td class="w-low">.46</td><td class="w-low">.48</td><td class="w-mod">.49</td><td class="w-mod">.51</td><td class="w-high">.52</td><td class="w-high">.54</td><td class="w-fail">.55</td><td class="w-fail">.57</td><td class="w-fail">.58</td><td class="w-fail">.59</td><td class="w-fail">.61</td><td class="w-fail">.62</td><td class="w-fail">.64</td></tr>
-                <tr><th class="sticky-col">70"</th><td class="w-low">.40</td><td class="w-low">.41</td><td class="w-low">.43</td><td class="w-low">.44</td><td class="w-low">.46</td><td class="w-low">.47</td><td class="w-low">.49</td><td class="w-mod">.50</td><td class="w-mod">.51</td><td class="w-high">.53</td><td class="w-high">.54</td><td class="w-fail">.56</td><td class="w-fail">.57</td><td class="w-fail">.59</td><td class="w-fail">.60</td><td class="w-fail">.61</td><td class="w-fail">.63</td></tr>
-                <tr><th class="sticky-col">71"</th><td class="w-low">.39</td><td class="w-low">.41</td><td class="w-low">.42</td><td class="w-low">.44</td><td class="w-low">.45</td><td class="w-low">.46</td><td class="w-low">.48</td><td class="w-mod">.49</td><td class="w-mod">.51</td><td class="w-high">.52</td><td class="w-high">.54</td><td class="w-fail">.55</td><td class="w-fail">.56</td><td class="w-fail">.58</td><td class="w-fail">.59</td><td class="w-fail">.61</td><td class="w-fail">.62</td></tr>
-                <tr><th class="sticky-col">72"</th><td class="w-low">.39</td><td class="w-low">.40</td><td class="w-low">.42</td><td class="w-low">.43</td><td class="w-low">.44</td><td class="w-low">.46</td><td class="w-low">.47</td><td class="w-low">.49</td><td class="w-mod">.50</td><td class="w-mod">.51</td><td class="w-high">.53</td><td class="w-high">.54</td><td class="w-fail">.56</td><td class="w-fail">.57</td><td class="w-fail">.58</td><td class="w-fail">.60</td><td class="w-fail">.61</td></tr>
-                <tr><th class="sticky-col">73"</th><td class="w-low">.38</td><td class="w-low">.40</td><td class="w-low">.41</td><td class="w-low">.42</td><td class="w-low">.44</td><td class="w-low">.45</td><td class="w-low">.47</td><td class="w-low">.48</td><td class="w-mod">.49</td><td class="w-mod">.51</td><td class="w-high">.52</td><td class="w-high">.53</td><td class="w-fail">.55</td><td class="w-fail">.56</td><td class="w-fail">.58</td><td class="w-fail">.59</td><td class="w-fail">.60</td></tr>
-                <tr><th class="sticky-col">74"</th><td class="w-low">.38</td><td class="w-low">.39</td><td class="w-low">.41</td><td class="w-low">.42</td><td class="w-low">.43</td><td class="w-low">.45</td><td class="w-low">.46</td><td class="w-low">.47</td><td class="w-low">.49</td><td class="w-mod">.50</td><td class="w-mod">.51</td><td class="w-high">.53</td><td class="w-high">.54</td><td class="w-fail">.55</td><td class="w-fail">.57</td><td class="w-fail">.58</td><td class="w-fail">.59</td></tr>
-                <tr><th class="sticky-col">75"</th><td class="w-low">.37</td><td class="w-low">.39</td><td class="w-low">.40</td><td class="w-low">.41</td><td class="w-low">.43</td><td class="w-low">.44</td><td class="w-low">.45</td><td class="w-low">.47</td><td class="w-low">.48</td><td class="w-mod">.49</td><td class="w-mod">.51</td><td class="w-high">.52</td><td class="w-high">.53</td><td class="w-fail">.55</td><td class="w-fail">.56</td><td class="w-fail">.57</td><td class="w-fail">.59</td></tr>
-                <tr><th class="sticky-col">76"</th><td class="w-low">.37</td><td class="w-low">.38</td><td class="w-low">.39</td><td class="w-low">.41</td><td class="w-low">.42</td><td class="w-low">.43</td><td class="w-low">.45</td><td class="w-low">.46</td><td class="w-low">.47</td><td class="w-low">.49</td><td class="w-mod">.50</td><td class="w-mod">.51</td><td class="w-high">.53</td><td class="w-high">.54</td><td class="w-fail">.55</td><td class="w-fail">.57</td><td class="w-fail">.58</td></tr>
-                <tr><th class="sticky-col">77"</th><td class="w-low">.36</td><td class="w-low">.38</td><td class="w-low">.39</td><td class="w-low">.40</td><td class="w-low">.42</td><td class="w-low">.43</td><td class="w-low">.44</td><td class="w-low">.45</td><td class="w-low">.47</td><td class="w-low">.48</td><td class="w-mod">.49</td><td class="w-mod">.51</td><td class="w-high">.52</td><td class="w-high">.53</td><td class="w-fail">.55</td><td class="w-fail">.56</td><td class="w-fail">.57</td></tr>
-                <tr><th class="sticky-col">78"</th><td class="w-low">.36</td><td class="w-low">.37</td><td class="w-low">.38</td><td class="w-low">.40</td><td class="w-low">.41</td><td class="w-low">.42</td><td class="w-low">.44</td><td class="w-low">.45</td><td class="w-low">.46</td><td class="w-low">.47</td><td class="w-low">.49</td><td class="w-mod">.50</td><td class="w-mod">.51</td><td class="w-high">.53</td><td class="w-high">.54</td><td class="w-fail">.55</td><td class="w-fail">.56</td></tr>
-            </tbody>
+            <tbody id="whtr-tbody">
+                </tbody>
         </table>
     </div>
 
@@ -451,8 +417,42 @@
             </tbody>
         </table>
     </div>
-
 </div>
+
+<script>
+// INSTANTLY CALCULATE AND POPULATE THE WtHR GRID TO SAVE 15KB OF HTML FILE SIZE
+document.addEventListener("DOMContentLoaded", function() {
+    const thead = document.getElementById("whtr-thead-row");
+    const tbody = document.getElementById("whtr-tbody");
+    
+    // 1. Build Headers (28.0 to 44.0)
+    let headHTML = '<th class="sticky-col">Ht \\ Wst</th>';
+    for (let w = 28.0; w <= 44.0; w += 0.5) {
+        headHTML += `<th>${w.toFixed(1)}"</th>`;
+    }
+    thead.innerHTML = headHTML;
+    
+    // 2. Build Matrix Rows (58 to 78)
+    let bodyHTML = '';
+    for (let h = 58; h <= 78; h++) {
+        bodyHTML += `<tr><th class="sticky-col">${h}"</th>`;
+        for (let w = 28.0; w <= 44.0; w += 0.5) {
+            // Divide and round to 2 decimal places to match Air Force calculation [cite: 1, 13]
+            const ratio = (w / h).toFixed(2);
+            const ratioNum = parseFloat(ratio);
+            
+            let cls = 'w-fail';
+            if (ratioNum < 0.49) cls = 'w-low';
+            else if (ratioNum < 0.52) cls = 'w-mod';
+            else if (ratioNum < 0.55) cls = 'w-high';
+            
+            bodyHTML += `<td class="${cls}">${ratio.replace('0.', '.')}</td>`;
+        }
+        bodyHTML += `</tr>`;
+    }
+    tbody.innerHTML = bodyHTML;
+});
+</script>
 
 </body>
 </html>
