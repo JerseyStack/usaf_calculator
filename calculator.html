@@ -3,110 +3,171 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fitness Assessment Standards</title>
+    <title>WtHR Assessment Standards</title>
     <style>
         :root { --bg: #ffffff; --text: #212529; --border: #dee2e6; --header: #f8f9fa; --alt: #f2f2f2; }
         body { font-family: -apple-system, system-ui, sans-serif; line-height: 1.4; color: var(--text); background: var(--bg); margin: 0; padding: 20px; }
         .container { max-width: 1100px; margin: auto; }
         h2 { border-bottom: 2px solid #0056b3; padding-bottom: 5px; color: #0056b3; }
-        .table-wrapper { overflow-x: auto; margin-bottom: 40px; border: 1px solid var(--border); }
+        .table-wrapper { 
+            overflow: auto; /* Allows both horizontal and vertical scrolling */
+            max-height: 600px; /* Keeps the table contained */
+            margin-bottom: 40px; 
+            border: 1px solid var(--border); 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
         table { width: 100%; border-collapse: collapse; white-space: nowrap; font-size: 13px; }
         th, td { border: 1px solid var(--border); padding: 8px; text-align: center; }
-        th { background: var(--header); font-weight: 700; position: sticky; left: 0; z-index: 1; }
-        tr:nth-child(even) { background: var(--alt); }
-        .sticky-col { position: sticky; left: 0; background: var(--header); font-weight: bold; }
-        .pass-tier { background-color: #d4edda !important; }
-        .fail-tier { background-color: #f8d7da !important; }
-        .wthr-table td { padding: 12px; }
+        
+        /* Sticky Header and Column Logic */
+        th.sticky-top { position: sticky; top: 0; z-index: 2; background: var(--header); font-weight: 700; border-bottom: 2px solid #ccc; }
+        th.sticky-col { position: sticky; left: 0; z-index: 2; background: var(--header); font-weight: 700; border-right: 2px solid #ccc; }
+        th.sticky-corner { position: sticky; top: 0; left: 0; z-index: 3; background: var(--header); border-right: 2px solid #ccc; border-bottom: 2px solid #ccc; }
+        
+        /* WtHR Color Coding */
+        .w-low { background-color: #d4edda; color: #155724; }  /* < 0.490: 20 pts */
+        .w-mod { background-color: #fff3cd; color: #856404; }  /* 0.490 - 0.519: 15 pts */
+        .w-high { background-color: #ffe8d6; color: #d35400; } /* 0.520 - 0.549: 10 pts */
+        .w-fail { background-color: #f8d7da; color: #721c24; font-weight: bold; } /* >= 0.550: 0 pts */
+        
+        .legend { display: flex; gap: 15px; margin-bottom: 15px; font-size: 14px; font-weight: bold; flex-wrap: wrap; }
+        .legend span { padding: 4px 8px; border-radius: 4px; border: 1px solid #ccc; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>Push-Up Scoring (Full Age Standards)</h2>
+    <h2>Waist-to-Height Ratio (WtHR) Matrix</h2>
+    
+    <div class="legend">
+        <span class="w-low">Low Risk (20 pts)</span>
+        <span class="w-mod">Moderate Risk (15 pts)</span>
+        <span class="w-high">High Risk (10 pts)</span>
+        <span class="w-fail">Very High Risk (0 pts)</span>
+    </div>
+
     <div class="table-wrapper">
         <table>
             <thead>
                 <tr>
-                    <th rowspan="2" class="sticky-col">Points</th>
-                    <th colspan="2">&lt;25</th>
-                    <th colspan="2">25-29</th>
-                    <th colspan="2">30-34</th>
-                    <th colspan="2">35-39</th>
-                    <th colspan="2">40-44</th>
-                    <th colspan="2">45-49</th>
-                    <th colspan="2">50-54</th>
-                    <th colspan="2">55-59</th>
-                    <th colspan="2">60+</th>
-                </tr>
-                <tr>
-                    <th>M</th><th>F</th><th>M</th><th>F</th><th>M</th><th>F</th><th>M</th><th>F</th><th>M</th><th>F</th><th>M</th><th>F</th><th>M</th><th>F</th><th>M</th><th>F</th><th>M</th><th>F</th>
+                    <th class="sticky-corner">Height (in) &darr; | Waist (in) &rarr;</th>
+                    <th class="sticky-top">28</th><th class="sticky-top">29</th><th class="sticky-top">30</th><th class="sticky-top">31</th>
+                    <th class="sticky-top">32</th><th class="sticky-top">33</th><th class="sticky-top">34</th><th class="sticky-top">35</th>
+                    <th class="sticky-top">36</th><th class="sticky-top">37</th><th class="sticky-top">38</th><th class="sticky-top">39</th>
+                    <th class="sticky-top">40</th><th class="sticky-top">41</th><th class="sticky-top">42</th><th class="sticky-top">43</th>
+                    <th class="sticky-top">44</th>
                 </tr>
             </thead>
             <tbody>
-                <tr class="pass-tier">
-                    <td class="sticky-col">15.0</td>
-                    <td>67</td><td>50</td><td>63</td><td>47</td><td>60</td><td>44</td><td>56</td><td>42</td><td>52</td><td>39</td><td>49</td><td>36</td><td>45</td><td>34</td><td>42</td><td>31</td><td>38</td><td>28</td>
-                </tr>
-                <tr>
-                    <td class="sticky-col">14.5</td>
-                    <td>66</td><td>49</td><td>62</td><td>46</td><td>59</td><td>42</td><td>55</td><td>41</td><td>51</td><td>38</td><td>47</td><td>35</td><td>44</td><td>33</td><td>41</td><td>30</td><td>37</td><td>27</td>
-                </tr>
-                <tr>
-                    <td class="sticky-col">14.0</td>
-                    <td>64</td><td>48</td><td>61</td><td>45</td><td>57</td><td>41</td><td>54</td><td>40</td><td>50</td><td>37</td><td>46</td><td>34</td><td>42</td><td>32</td><td>40</td><td>29</td><td>36</td><td>26</td>
-                </tr>
-                <tr>
-                    <td class="sticky-col">13.5</td>
-                    <td>63</td><td>47</td><td>59</td><td>44</td><td>56</td><td>40</td><td>53</td><td>39</td><td>49</td><td>36</td><td>45</td><td>33</td><td>41</td><td>31</td><td>39</td><td>28</td><td>35</td><td>25</td>
-                </tr>
-                <tr>
-                    <td class="sticky-col">13.0</td>
-                    <td>61</td><td>46</td><td>58</td><td>43</td><td>54</td><td>39</td><td>51</td><td>38</td><td>48</td><td>35</td><td>44</td><td>32</td><td>40</td><td>30</td><td>38</td><td>27</td><td>34</td><td>24</td>
-                </tr>
-                <tr>
-                    <td class="sticky-col">10.0</td>
-                    <td>52</td><td>40</td><td>49</td><td>37</td><td>45</td><td>34</td><td>43</td><td>33</td><td>40</td><td>30</td><td>37</td><td>28</td><td>33</td><td>26</td><td>31</td><td>23</td><td>28</td><td>21</td>
-                </tr>
-                <tr class="fail-tier">
-                    <td class="sticky-col">Minimum</td>
-                    <td>30</td><td>15</td><td>27</td><td>14</td><td>24</td><td>12</td><td>21</td><td>10</td><td>19</td><td>9</td><td>16</td><td>8</td><td>13</td><td>7</td><td>11</td><td>6</td><td>10</td><td>5</td>
-                </tr>
+                <tr><th class="sticky-col">58</th><td class="w-low">0.48</td><td class="w-mod">0.50</td><td class="w-high">0.52</td><td class="w-high">0.53</td><td class="w-fail">0.55</td><td class="w-fail">0.57</td><td class="w-fail">0.59</td><td class="w-fail">0.60</td><td class="w-fail">0.62</td><td class="w-fail">0.64</td><td class="w-fail">0.66</td><td class="w-fail">0.67</td><td class="w-fail">0.69</td><td class="w-fail">0.71</td><td class="w-fail">0.72</td><td class="w-fail">0.74</td><td class="w-fail">0.76</td></tr>
+                <tr><th class="sticky-col">59</th><td class="w-low">0.47</td><td class="w-mod">0.49</td><td class="w-mod">0.51</td><td class="w-high">0.53</td><td class="w-high">0.54</td><td class="w-fail">0.56</td><td class="w-fail">0.58</td><td class="w-fail">0.59</td><td class="w-fail">0.61</td><td class="w-fail">0.63</td><td class="w-fail">0.64</td><td class="w-fail">0.66</td><td class="w-fail">0.68</td><td class="w-fail">0.69</td><td class="w-fail">0.71</td><td class="w-fail">0.73</td><td class="w-fail">0.75</td></tr>
+                <tr><th class="sticky-col">60</th><td class="w-low">0.47</td><td class="w-low">0.48</td><td class="w-mod">0.50</td><td class="w-mod">0.52</td><td class="w-high">0.53</td><td class="w-fail">0.55</td><td class="w-fail">0.57</td><td class="w-fail">0.58</td><td class="w-fail">0.60</td><td class="w-fail">0.62</td><td class="w-fail">0.63</td><td class="w-fail">0.65</td><td class="w-fail">0.67</td><td class="w-fail">0.68</td><td class="w-fail">0.70</td><td class="w-fail">0.72</td><td class="w-fail">0.73</td></tr>
+                <tr><th class="sticky-col">61</th><td class="w-low">0.46</td><td class="w-low">0.48</td><td class="w-mod">0.49</td><td class="w-mod">0.51</td><td class="w-high">0.52</td><td class="w-high">0.54</td><td class="w-fail">0.56</td><td class="w-fail">0.57</td><td class="w-fail">0.59</td><td class="w-fail">0.61</td><td class="w-fail">0.62</td><td class="w-fail">0.64</td><td class="w-fail">0.66</td><td class="w-fail">0.67</td><td class="w-fail">0.69</td><td class="w-fail">0.70</td><td class="w-fail">0.72</td></tr>
+                <tr><th class="sticky-col">62</th><td class="w-low">0.45</td><td class="w-low">0.47</td><td class="w-low">0.48</td><td class="w-mod">0.50</td><td class="w-mod">0.52</td><td class="w-high">0.53</td><td class="w-fail">0.55</td><td class="w-fail">0.56</td><td class="w-fail">0.58</td><td class="w-fail">0.60</td><td class="w-fail">0.61</td><td class="w-fail">0.63</td><td class="w-fail">0.65</td><td class="w-fail">0.66</td><td class="w-fail">0.68</td><td class="w-fail">0.69</td><td class="w-fail">0.71</td></tr>
+                <tr><th class="sticky-col">63</th><td class="w-low">0.44</td><td class="w-low">0.46</td><td class="w-low">0.48</td><td class="w-mod">0.49</td><td class="w-mod">0.51</td><td class="w-high">0.52</td><td class="w-high">0.54</td><td class="w-fail">0.56</td><td class="w-fail">0.57</td><td class="w-fail">0.59</td><td class="w-fail">0.60</td><td class="w-fail">0.62</td><td class="w-fail">0.63</td><td class="w-fail">0.65</td><td class="w-fail">0.67</td><td class="w-fail">0.68</td><td class="w-fail">0.70</td></tr>
+                <tr><th class="sticky-col">64</th><td class="w-low">0.44</td><td class="w-low">0.45</td><td class="w-low">0.47</td><td class="w-low">0.48</td><td class="w-mod">0.50</td><td class="w-mod">0.52</td><td class="w-high">0.53</td><td class="w-fail">0.55</td><td class="w-fail">0.56</td><td class="w-fail">0.58</td><td class="w-fail">0.59</td><td class="w-fail">0.61</td><td class="w-fail">0.63</td><td class="w-fail">0.64</td><td class="w-fail">0.66</td><td class="w-fail">0.67</td><td class="w-fail">0.69</td></tr>
+                <tr><th class="sticky-col">65</th><td class="w-low">0.43</td><td class="w-low">0.45</td><td class="w-low">0.46</td><td class="w-low">0.48</td><td class="w-mod">0.49</td><td class="w-mod">0.51</td><td class="w-high">0.52</td><td class="w-high">0.54</td><td class="w-fail">0.55</td><td class="w-fail">0.57</td><td class="w-fail">0.58</td><td class="w-fail">0.60</td><td class="w-fail">0.62</td><td class="w-fail">0.63</td><td class="w-fail">0.65</td><td class="w-fail">0.66</td><td class="w-fail">0.68</td></tr>
+                <tr><th class="sticky-col">66</th><td class="w-low">0.42</td><td class="w-low">0.44</td><td class="w-low">0.45</td><td class="w-low">0.47</td><td class="w-low">0.48</td><td class="w-mod">0.50</td><td class="w-mod">0.52</td><td class="w-high">0.53</td><td class="w-fail">0.55</td><td class="w-fail">0.56</td><td class="w-fail">0.58</td><td class="w-fail">0.59</td><td class="w-fail">0.61</td><td class="w-fail">0.62</td><td class="w-fail">0.64</td><td class="w-fail">0.65</td><td class="w-fail">0.67</td></tr>
+                <tr><th class="sticky-col">67</th><td class="w-low">0.42</td><td class="w-low">0.43</td><td class="w-low">0.45</td><td class="w-low">0.46</td><td class="w-low">0.48</td><td class="w-mod">0.49</td><td class="w-mod">0.51</td><td class="w-high">0.52</td><td class="w-high">0.54</td><td class="w-fail">0.55</td><td class="w-fail">0.57</td><td class="w-fail">0.58</td><td class="w-fail">0.60</td><td class="w-fail">0.61</td><td class="w-fail">0.63</td><td class="w-fail">0.64</td><td class="w-fail">0.66</td></tr>
+                <tr><th class="sticky-col">68</th><td class="w-low">0.41</td><td class="w-low">0.43</td><td class="w-low">0.44</td><td class="w-low">0.46</td><td class="w-low">0.47</td><td class="w-low">0.49</td><td class="w-mod">0.50</td><td class="w-mod">0.51</td><td class="w-high">0.53</td><td class="w-high">0.54</td><td class="w-fail">0.56</td><td class="w-fail">0.57</td><td class="w-fail">0.59</td><td class="w-fail">0.60</td><td class="w-fail">0.62</td><td class="w-fail">0.63</td><td class="w-fail">0.65</td></tr>
+                <tr><th class="sticky-col">69</th><td class="w-low">0.41</td><td class="w-low">0.42</td><td class="w-low">0.43</td><td class="w-low">0.45</td><td class="w-low">0.46</td><td class="w-low">0.48</td><td class="w-mod">0.49</td><td class="w-mod">0.51</td><td class="w-high">0.52</td><td class="w-high">0.54</td><td class="w-fail">0.55</td><td class="w-fail">0.57</td><td class="w-fail">0.58</td><td class="w-fail">0.59</td><td class="w-fail">0.61</td><td class="w-fail">0.62</td><td class="w-fail">0.64</td></tr>
+                <tr><th class="sticky-col">70</th><td class="w-low">0.40</td><td class="w-low">0.41</td><td class="w-low">0.43</td><td class="w-low">0.44</td><td class="w-low">0.46</td><td class="w-low">0.47</td><td class="w-low">0.49</td><td class="w-mod">0.50</td><td class="w-mod">0.51</td><td class="w-high">0.53</td><td class="w-high">0.54</td><td class="w-fail">0.56</td><td class="w-fail">0.57</td><td class="w-fail">0.59</td><td class="w-fail">0.60</td><td class="w-fail">0.61</td><td class="w-fail">0.63</td></tr>
+                <tr><th class="sticky-col">71</th><td class="w-low">0.39</td><td class="w-low">0.41</td><td class="w-low">0.42</td><td class="w-low">0.44</td><td class="w-low">0.45</td><td class="w-low">0.46</td><td class="w-low">0.48</td><td class="w-mod">0.49</td><td class="w-mod">0.51</td><td class="w-high">0.52</td><td class="w-high">0.54</td><td class="w-fail">0.55</td><td class="w-fail">0.56</td><td class="w-fail">0.58</td><td class="w-fail">0.59</td><td class="w-fail">0.61</td><td class="w-fail">0.62</td></tr>
+                <tr><th class="sticky-col">72</th><td class="w-low">0.39</td><td class="w-low">0.40</td><td class="w-low">0.42</td><td class="w-low">0.43</td><td class="w-low">0.44</td><td class="w-low">0.46</td><td class="w-low">0.47</td><td class="w-low">0.49</td><td class="w-mod">0.50</td><td class="w-mod">0.51</td><td class="w-high">0.53</td><td class="w-high">0.54</td><td class="w-fail">0.56</td><td class="w-fail">0.57</td><td class="w-fail">0.58</td><td class="w-fail">0.60</td><td class="w-fail">0.61</td></tr>
+                <tr><th class="sticky-col">73</th><td class="w-low">0.38</td><td class="w-low">0.40</td><td class="w-low">0.41</td><td class="w-low">0.42</td><td class="w-low">0.44</td><td class="w-low">0.45</td><td class="w-low">0.47</td><td class="w-low">0.48</td><td class="w-mod">0.49</td><td class="w-mod">0.51</td><td class="w-high">0.52</td><td class="w-high">0.53</td><td class="w-fail">0.55</td><td class="w-fail">0.56</td><td class="w-fail">0.58</td><td class="w-fail">0.59</td><td class="w-fail">0.60</td></tr>
+                <tr><th class="sticky-col">74</th><td class="w-low">0.38</td><td class="w-low">0.39</td><td class="w-low">0.41</td><td class="w-low">0.42</td><td class="w-low">0.43</td><td class="w-low">0.45</td><td class="w-low">0.46</td><td class="w-low">0.47</td><td class="w-low">0.49</td><td class="w-mod">0.50</td><td class="w-mod">0.51</td><td class="w-high">0.53</td><td class="w-high">0.54</td><td class="w-fail">0.55</td><td class="w-fail">0.57</td><td class="w-fail">0.58</td><td class="w-fail">0.59</td></tr>
+                <tr><th class="sticky-col">75</th><td class="w-low">0.37</td><td class="w-low">0.39</td><td class="w-low">0.40</td><td class="w-low">0.41</td><td class="w-low">0.43</td><td class="w-low">0.44</td><td class="w-low">0.45</td><td class="w-low">0.47</td><td class="w-low">0.48</td><td class="w-mod">0.49</td><td class="w-mod">0.51</td><td class="w-high">0.52</td><td class="w-high">0.53</td><td class="w-fail">0.55</td><td class="w-fail">0.56</td><td class="w-fail">0.57</td><td class="w-fail">0.59</td></tr>
+                <tr><th class="sticky-col">76</th><td class="w-low">0.37</td><td class="w-low">0.38</td><td class="w-low">0.39</td><td class="w-low">0.41</td><td class="w-low">0.42</td><td class="w-low">0.43</td><td class="w-low">0.45</td><td class="w-low">0.46</td><td class="w-low">0.47</td><td class="w-low">0.49</td><td class="w-mod">0.50</td><td class="w-mod">0.51</td><td class="w-high">0.53</td><td class="w-high">0.54</td><td class="w-fail">0.55</td><td class="w-fail">0.57</td><td class="w-fail">0.58</td></tr>
+                <tr><th class="sticky-col">77</th><td class="w-low">0.36</td><td class="w-low">0.38</td><td class="w-low">0.39</td><td class="w-low">0.40</td><td class="w-low">0.42</td><td class="w-low">0.43</td><td class="w-low">0.44</td><td class="w-low">0.45</td><td class="w-low">0.47</td><td class="w-low">0.48</td><td class="w-mod">0.49</td><td class="w-mod">0.51</td><td class="w-high">0.52</td><td class="w-high">0.53</td><td class="w-fail">0.55</td><td class="w-fail">0.56</td><td class="w-fail">0.57</td></tr>
+                <tr><th class="sticky-col">78</th><td class="w-low">0.36</td><td class="w-low">0.37</td><td class="w-low">0.38</td><td class="w-low">0.40</td><td class="w-low">0.41</td><td class="w-low">0.42</td><td class="w-low">0.44</td><td class="w-low">0.45</td><td class="w-low">0.46</td><td class="w-low">0.47</td><td class="w-low">0.49</td><td class="w-mod">0.50</td><td class="w-mod">0.51</td><td class="w-high">0.53</td><td class="w-high">0.54</td><td class="w-fail">0.55</td><td class="w-fail">0.56</td></tr>
             </tbody>
         </table>
     </div>
+</div>
 
-    <h2>Waist-to-Height Ratio (WtHR) Scoring</h2>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WtHR Assessment Standards</title>
+    <style>
+        :root { --bg: #ffffff; --text: #212529; --border: #dee2e6; --header: #f8f9fa; --alt: #f2f2f2; }
+        body { font-family: -apple-system, system-ui, sans-serif; line-height: 1.4; color: var(--text); background: var(--bg); margin: 0; padding: 20px; }
+        .container { max-width: 1100px; margin: auto; }
+        h2 { border-bottom: 2px solid #0056b3; padding-bottom: 5px; color: #0056b3; }
+        .table-wrapper { 
+            overflow: auto; /* Allows both horizontal and vertical scrolling */
+            max-height: 600px; /* Keeps the table contained */
+            margin-bottom: 40px; 
+            border: 1px solid var(--border); 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        table { width: 100%; border-collapse: collapse; white-space: nowrap; font-size: 13px; }
+        th, td { border: 1px solid var(--border); padding: 8px; text-align: center; }
+        
+        /* Sticky Header and Column Logic */
+        th.sticky-top { position: sticky; top: 0; z-index: 2; background: var(--header); font-weight: 700; border-bottom: 2px solid #ccc; }
+        th.sticky-col { position: sticky; left: 0; z-index: 2; background: var(--header); font-weight: 700; border-right: 2px solid #ccc; }
+        th.sticky-corner { position: sticky; top: 0; left: 0; z-index: 3; background: var(--header); border-right: 2px solid #ccc; border-bottom: 2px solid #ccc; }
+        
+        /* WtHR Color Coding */
+        .w-low { background-color: #d4edda; color: #155724; }  /* < 0.490: 20 pts */
+        .w-mod { background-color: #fff3cd; color: #856404; }  /* 0.490 - 0.519: 15 pts */
+        .w-high { background-color: #ffe8d6; color: #d35400; } /* 0.520 - 0.549: 10 pts */
+        .w-fail { background-color: #f8d7da; color: #721c24; font-weight: bold; } /* >= 0.550: 0 pts */
+        
+        .legend { display: flex; gap: 15px; margin-bottom: 15px; font-size: 14px; font-weight: bold; flex-wrap: wrap; }
+        .legend span { padding: 4px 8px; border-radius: 4px; border: 1px solid #ccc; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Waist-to-Height Ratio (WtHR) Matrix</h2>
+    
+    <div class="legend">
+        <span class="w-low">Low Risk (20 pts)</span>
+        <span class="w-mod">Moderate Risk (15 pts)</span>
+        <span class="w-high">High Risk (10 pts)</span>
+        <span class="w-fail">Very High Risk (0 pts)</span>
+    </div>
+
     <div class="table-wrapper">
-        <table class="wthr-table">
+        <table>
             <thead>
                 <tr>
-                    <th>Risk Category</th>
-                    <th>Ratio Range (Waist &divide; Height)</th>
-                    <th>Points</th>
+                    <th class="sticky-corner">Height (in) &darr; | Waist (in) &rarr;</th>
+                    <th class="sticky-top">28</th><th class="sticky-top">29</th><th class="sticky-top">30</th><th class="sticky-top">31</th>
+                    <th class="sticky-top">32</th><th class="sticky-top">33</th><th class="sticky-top">34</th><th class="sticky-top">35</th>
+                    <th class="sticky-top">36</th><th class="sticky-top">37</th><th class="sticky-top">38</th><th class="sticky-top">39</th>
+                    <th class="sticky-top">40</th><th class="sticky-top">41</th><th class="sticky-top">42</th><th class="sticky-top">43</th>
+                    <th class="sticky-top">44</th>
                 </tr>
             </thead>
             <tbody>
-                <tr style="border-left: 10px solid #28a745;">
-                    <td><strong>Low Risk</strong></td>
-                    <td>Less than 0.490</td>
-                    <td><strong>20.0</strong></td>
-                </tr>
-                <tr style="border-left: 10px solid #ffc107;">
-                    <td><strong>Moderate Risk</strong></td>
-                    <td>0.490 to 0.519</td>
-                    <td><strong>15.0</strong></td>
-                </tr>
-                <tr style="border-left: 10px solid #fd7e14;">
-                    <td><strong>High Risk</strong></td>
-                    <td>0.520 to 0.549</td>
-                    <td><strong>10.0</strong></td>
-                </tr>
-                <tr style="border-left: 10px solid #dc3545;">
-                    <td><strong>Very High Risk</strong></td>
-                    <td>0.550 or Greater</td>
-                    <td><strong>0.0</strong></td>
-                </tr>
+                <tr><th class="sticky-col">58</th><td class="w-low">0.48</td><td class="w-mod">0.50</td><td class="w-high">0.52</td><td class="w-high">0.53</td><td class="w-fail">0.55</td><td class="w-fail">0.57</td><td class="w-fail">0.59</td><td class="w-fail">0.60</td><td class="w-fail">0.62</td><td class="w-fail">0.64</td><td class="w-fail">0.66</td><td class="w-fail">0.67</td><td class="w-fail">0.69</td><td class="w-fail">0.71</td><td class="w-fail">0.72</td><td class="w-fail">0.74</td><td class="w-fail">0.76</td></tr>
+                <tr><th class="sticky-col">59</th><td class="w-low">0.47</td><td class="w-mod">0.49</td><td class="w-mod">0.51</td><td class="w-high">0.53</td><td class="w-high">0.54</td><td class="w-fail">0.56</td><td class="w-fail">0.58</td><td class="w-fail">0.59</td><td class="w-fail">0.61</td><td class="w-fail">0.63</td><td class="w-fail">0.64</td><td class="w-fail">0.66</td><td class="w-fail">0.68</td><td class="w-fail">0.69</td><td class="w-fail">0.71</td><td class="w-fail">0.73</td><td class="w-fail">0.75</td></tr>
+                <tr><th class="sticky-col">60</th><td class="w-low">0.47</td><td class="w-low">0.48</td><td class="w-mod">0.50</td><td class="w-mod">0.52</td><td class="w-high">0.53</td><td class="w-fail">0.55</td><td class="w-fail">0.57</td><td class="w-fail">0.58</td><td class="w-fail">0.60</td><td class="w-fail">0.62</td><td class="w-fail">0.63</td><td class="w-fail">0.65</td><td class="w-fail">0.67</td><td class="w-fail">0.68</td><td class="w-fail">0.70</td><td class="w-fail">0.72</td><td class="w-fail">0.73</td></tr>
+                <tr><th class="sticky-col">61</th><td class="w-low">0.46</td><td class="w-low">0.48</td><td class="w-mod">0.49</td><td class="w-mod">0.51</td><td class="w-high">0.52</td><td class="w-high">0.54</td><td class="w-fail">0.56</td><td class="w-fail">0.57</td><td class="w-fail">0.59</td><td class="w-fail">0.61</td><td class="w-fail">0.62</td><td class="w-fail">0.64</td><td class="w-fail">0.66</td><td class="w-fail">0.67</td><td class="w-fail">0.69</td><td class="w-fail">0.70</td><td class="w-fail">0.72</td></tr>
+                <tr><th class="sticky-col">62</th><td class="w-low">0.45</td><td class="w-low">0.47</td><td class="w-low">0.48</td><td class="w-mod">0.50</td><td class="w-mod">0.52</td><td class="w-high">0.53</td><td class="w-fail">0.55</td><td class="w-fail">0.56</td><td class="w-fail">0.58</td><td class="w-fail">0.60</td><td class="w-fail">0.61</td><td class="w-fail">0.63</td><td class="w-fail">0.65</td><td class="w-fail">0.66</td><td class="w-fail">0.68</td><td class="w-fail">0.69</td><td class="w-fail">0.71</td></tr>
+                <tr><th class="sticky-col">63</th><td class="w-low">0.44</td><td class="w-low">0.46</td><td class="w-low">0.48</td><td class="w-mod">0.49</td><td class="w-mod">0.51</td><td class="w-high">0.52</td><td class="w-high">0.54</td><td class="w-fail">0.56</td><td class="w-fail">0.57</td><td class="w-fail">0.59</td><td class="w-fail">0.60</td><td class="w-fail">0.62</td><td class="w-fail">0.63</td><td class="w-fail">0.65</td><td class="w-fail">0.67</td><td class="w-fail">0.68</td><td class="w-fail">0.70</td></tr>
+                <tr><th class="sticky-col">64</th><td class="w-low">0.44</td><td class="w-low">0.45</td><td class="w-low">0.47</td><td class="w-low">0.48</td><td class="w-mod">0.50</td><td class="w-mod">0.52</td><td class="w-high">0.53</td><td class="w-fail">0.55</td><td class="w-fail">0.56</td><td class="w-fail">0.58</td><td class="w-fail">0.59</td><td class="w-fail">0.61</td><td class="w-fail">0.63</td><td class="w-fail">0.64</td><td class="w-fail">0.66</td><td class="w-fail">0.67</td><td class="w-fail">0.69</td></tr>
+                <tr><th class="sticky-col">65</th><td class="w-low">0.43</td><td class="w-low">0.45</td><td class="w-low">0.46</td><td class="w-low">0.48</td><td class="w-mod">0.49</td><td class="w-mod">0.51</td><td class="w-high">0.52</td><td class="w-high">0.54</td><td class="w-fail">0.55</td><td class="w-fail">0.57</td><td class="w-fail">0.58</td><td class="w-fail">0.60</td><td class="w-fail">0.62</td><td class="w-fail">0.63</td><td class="w-fail">0.65</td><td class="w-fail">0.66</td><td class="w-fail">0.68</td></tr>
+                <tr><th class="sticky-col">66</th><td class="w-low">0.42</td><td class="w-low">0.44</td><td class="w-low">0.45</td><td class="w-low">0.47</td><td class="w-low">0.48</td><td class="w-mod">0.50</td><td class="w-mod">0.52</td><td class="w-high">0.53</td><td class="w-fail">0.55</td><td class="w-fail">0.56</td><td class="w-fail">0.58</td><td class="w-fail">0.59</td><td class="w-fail">0.61</td><td class="w-fail">0.62</td><td class="w-fail">0.64</td><td class="w-fail">0.65</td><td class="w-fail">0.67</td></tr>
+                <tr><th class="sticky-col">67</th><td class="w-low">0.42</td><td class="w-low">0.43</td><td class="w-low">0.45</td><td class="w-low">0.46</td><td class="w-low">0.48</td><td class="w-mod">0.49</td><td class="w-mod">0.51</td><td class="w-high">0.52</td><td class="w-high">0.54</td><td class="w-fail">0.55</td><td class="w-fail">0.57</td><td class="w-fail">0.58</td><td class="w-fail">0.60</td><td class="w-fail">0.61</td><td class="w-fail">0.63</td><td class="w-fail">0.64</td><td class="w-fail">0.66</td></tr>
+                <tr><th class="sticky-col">68</th><td class="w-low">0.41</td><td class="w-low">0.43</td><td class="w-low">0.44</td><td class="w-low">0.46</td><td class="w-low">0.47</td><td class="w-low">0.49</td><td class="w-mod">0.50</td><td class="w-mod">0.51</td><td class="w-high">0.53</td><td class="w-high">0.54</td><td class="w-fail">0.56</td><td class="w-fail">0.57</td><td class="w-fail">0.59</td><td class="w-fail">0.60</td><td class="w-fail">0.62</td><td class="w-fail">0.63</td><td class="w-fail">0.65</td></tr>
+                <tr><th class="sticky-col">69</th><td class="w-low">0.41</td><td class="w-low">0.42</td><td class="w-low">0.43</td><td class="w-low">0.45</td><td class="w-low">0.46</td><td class="w-low">0.48</td><td class="w-mod">0.49</td><td class="w-mod">0.51</td><td class="w-high">0.52</td><td class="w-high">0.54</td><td class="w-fail">0.55</td><td class="w-fail">0.57</td><td class="w-fail">0.58</td><td class="w-fail">0.59</td><td class="w-fail">0.61</td><td class="w-fail">0.62</td><td class="w-fail">0.64</td></tr>
+                <tr><th class="sticky-col">70</th><td class="w-low">0.40</td><td class="w-low">0.41</td><td class="w-low">0.43</td><td class="w-low">0.44</td><td class="w-low">0.46</td><td class="w-low">0.47</td><td class="w-low">0.49</td><td class="w-mod">0.50</td><td class="w-mod">0.51</td><td class="w-high">0.53</td><td class="w-high">0.54</td><td class="w-fail">0.56</td><td class="w-fail">0.57</td><td class="w-fail">0.59</td><td class="w-fail">0.60</td><td class="w-fail">0.61</td><td class="w-fail">0.63</td></tr>
+                <tr><th class="sticky-col">71</th><td class="w-low">0.39</td><td class="w-low">0.41</td><td class="w-low">0.42</td><td class="w-low">0.44</td><td class="w-low">0.45</td><td class="w-low">0.46</td><td class="w-low">0.48</td><td class="w-mod">0.49</td><td class="w-mod">0.51</td><td class="w-high">0.52</td><td class="w-high">0.54</td><td class="w-fail">0.55</td><td class="w-fail">0.56</td><td class="w-fail">0.58</td><td class="w-fail">0.59</td><td class="w-fail">0.61</td><td class="w-fail">0.62</td></tr>
+                <tr><th class="sticky-col">72</th><td class="w-low">0.39</td><td class="w-low">0.40</td><td class="w-low">0.42</td><td class="w-low">0.43</td><td class="w-low">0.44</td><td class="w-low">0.46</td><td class="w-low">0.47</td><td class="w-low">0.49</td><td class="w-mod">0.50</td><td class="w-mod">0.51</td><td class="w-high">0.53</td><td class="w-high">0.54</td><td class="w-fail">0.56</td><td class="w-fail">0.57</td><td class="w-fail">0.58</td><td class="w-fail">0.60</td><td class="w-fail">0.61</td></tr>
+                <tr><th class="sticky-col">73</th><td class="w-low">0.38</td><td class="w-low">0.40</td><td class="w-low">0.41</td><td class="w-low">0.42</td><td class="w-low">0.44</td><td class="w-low">0.45</td><td class="w-low">0.47</td><td class="w-low">0.48</td><td class="w-mod">0.49</td><td class="w-mod">0.51</td><td class="w-high">0.52</td><td class="w-high">0.53</td><td class="w-fail">0.55</td><td class="w-fail">0.56</td><td class="w-fail">0.58</td><td class="w-fail">0.59</td><td class="w-fail">0.60</td></tr>
+                <tr><th class="sticky-col">74</th><td class="w-low">0.38</td><td class="w-low">0.39</td><td class="w-low">0.41</td><td class="w-low">0.42</td><td class="w-low">0.43</td><td class="w-low">0.45</td><td class="w-low">0.46</td><td class="w-low">0.47</td><td class="w-low">0.49</td><td class="w-mod">0.50</td><td class="w-mod">0.51</td><td class="w-high">0.53</td><td class="w-high">0.54</td><td class="w-fail">0.55</td><td class="w-fail">0.57</td><td class="w-fail">0.58</td><td class="w-fail">0.59</td></tr>
+                <tr><th class="sticky-col">75</th><td class="w-low">0.37</td><td class="w-low">0.39</td><td class="w-low">0.40</td><td class="w-low">0.41</td><td class="w-low">0.43</td><td class="w-low">0.44</td><td class="w-low">0.45</td><td class="w-low">0.47</td><td class="w-low">0.48</td><td class="w-mod">0.49</td><td class="w-mod">0.51</td><td class="w-high">0.52</td><td class="w-high">0.53</td><td class="w-fail">0.55</td><td class="w-fail">0.56</td><td class="w-fail">0.57</td><td class="w-fail">0.59</td></tr>
+                <tr><th class="sticky-col">76</th><td class="w-low">0.37</td><td class="w-low">0.38</td><td class="w-low">0.39</td><td class="w-low">0.41</td><td class="w-low">0.42</td><td class="w-low">0.43</td><td class="w-low">0.45</td><td class="w-low">0.46</td><td class="w-low">0.47</td><td class="w-low">0.49</td><td class="w-mod">0.50</td><td class="w-mod">0.51</td><td class="w-high">0.53</td><td class="w-high">0.54</td><td class="w-fail">0.55</td><td class="w-fail">0.57</td><td class="w-fail">0.58</td></tr>
+                <tr><th class="sticky-col">77</th><td class="w-low">0.36</td><td class="w-low">0.38</td><td class="w-low">0.39</td><td class="w-low">0.40</td><td class="w-low">0.42</td><td class="w-low">0.43</td><td class="w-low">0.44</td><td class="w-low">0.45</td><td class="w-low">0.47</td><td class="w-low">0.48</td><td class="w-mod">0.49</td><td class="w-mod">0.51</td><td class="w-high">0.52</td><td class="w-high">0.53</td><td class="w-fail">0.55</td><td class="w-fail">0.56</td><td class="w-fail">0.57</td></tr>
+                <tr><th class="sticky-col">78</th><td class="w-low">0.36</td><td class="w-low">0.37</td><td class="w-low">0.38</td><td class="w-low">0.40</td><td class="w-low">0.41</td><td class="w-low">0.42</td><td class="w-low">0.44</td><td class="w-low">0.45</td><td class="w-low">0.46</td><td class="w-low">0.47</td><td class="w-low">0.49</td><td class="w-mod">0.50</td><td class="w-mod">0.51</td><td class="w-high">0.53</td><td class="w-high">0.54</td><td class="w-fail">0.55</td><td class="w-fail">0.56</td></tr>
             </tbody>
         </table>
     </div>
