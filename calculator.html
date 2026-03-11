@@ -98,7 +98,7 @@
 
 <script>
 // ========================================================================
-// OFFICIAL POINT TIERS (No interpolated decimals)
+// OFFICIAL POINT TIERS 
 // ========================================================================
 const PtsCardio = [50.0, 49.5, 49.0, 48.0, 47.0, 46.0, 45.0, 44.0, 43.0, 42.0, 41.0, 40.0, 39.0, 38.5, 38.0, 37.5, 37.0, 36.5, 36.0, 35.5, 35.0];
 const PtsUpperCore = [15.0, 14.5, 14.0, 13.5, 13.0, 12.5, 12.0, 11.5, 11.0, 10.5, 10.0, 9.5, 9.0, 8.5, 8.0, 7.5, 7.0, 6.5, 6.0, 5.5, 5.0, 4.5, 4.0, 3.5, 3.0, 2.5];
@@ -379,8 +379,6 @@ const PT_DATA = {
   }
 };
 
-const PT_WHTR = { "0.49": 20, "0.50": 19, "0.51": 18, "0.52": 17, "0.53": 16, "0.54": 15, "0.55": 12.5, "0.56": 10, "0.57": 7.5, "0.58": 5, "0.59": 2.5, "0.60": 0 };
-
 const PT_MINIMUMS = { run: 35.0, hamr: 35.0, pushups: 2.5, handRelease: 2.5, situps: 2.5, crunch: 2.5, plank: 2.5, whtr: 0 };
 const SATISFACTORY_MIN = 75;
 
@@ -419,7 +417,6 @@ const lookupCardioTime = (valArr, userValSec) => {
 };
 
 // Used for Push-ups, Core, Plank, HAMR: Higher is better.
-// Example: If a 34 Male does 50 pushups, it checks 51 (false), then checks 49 (True). It immediately returns 11.0 points.
 const lookupHigherIsBetter = (valArr, userVal, isCardio, isTime = false) => {
   const pointsRef = isCardio ? PtsCardio : PtsUpperCore;
   for (let i = 0; i < valArr.length; i++) {
@@ -429,17 +426,21 @@ const lookupHigherIsBetter = (valArr, userVal, isCardio, isTime = false) => {
   return 0; // Fails to meet minimum
 };
 
+// WtHR is strict thresholds, 3 decimal place accuracy.
 const lookupWhtr = (waist, height) => {
   if (!waist || !height) return { pts: 0, ratio: "N/A", category: "Invalid" };
-  const ratio = (waist / height).toFixed(2);
-  const tiers = Object.keys(PT_WHTR).map(Number).sort((a, b) => a - b);
-  for (const tier of tiers) {
-    if (ratio <= tier) {
-      const category = ratio <= 0.49 ? "Low Risk" : ratio < 0.55 ? "Moderate Risk" : "High Risk";
-      return { pts: PT_WHTR[tier.toFixed(2)], ratio, category };
-    }
+  
+  const ratio = parseFloat((waist / height).toFixed(3));
+  
+  if (ratio < 0.49) {
+      return { pts: 20.0, ratio: ratio.toFixed(2), category: "Low Risk" };
+  } else if (ratio >= 0.49 && ratio < 0.52) {
+      return { pts: 15.0, ratio: ratio.toFixed(2), category: "Moderate Risk" };
+  } else if (ratio >= 0.52 && ratio < 0.55) {
+      return { pts: 10.0, ratio: ratio.toFixed(2), category: "High Risk" };
+  } else {
+      return { pts: 0.0, ratio: ratio.toFixed(2), category: "Very High Risk" };
   }
-  return { pts: 0, ratio, category: "Very High Risk" };
 };
 
 // ========================================================================
